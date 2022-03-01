@@ -1,0 +1,34 @@
+name: Azure App Service - Production branch -> Build, test and deployment
+
+on:
+    push:
+        branches:
+            - production
+
+jobs:
+    build-and-deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            # checkout the repo
+            - name: 'Checkout Github Action'
+              uses: actions/checkout@master
+
+            - name: Set up Node.js version
+              uses: actions/setup-node@v1
+              with:
+                  node-version: '14.x'
+
+            - name: npm install, build, and test
+              run: |
+                  npm install
+                  npm run build --if-present
+                  npm run test --if-present
+
+            - name: 'Deploy to docker hub'
+            - uses: docker/build-push-action@v1
+            - with:
+                  username: ${{secrets.DOCKER_HUB_USERNAME}}
+                  password: ${{secrets.DOCKER_HUB_PASSWORD}}
+                  repository: safeknight/backend-api
+                  tags: latest, ${{github.run_number}}
