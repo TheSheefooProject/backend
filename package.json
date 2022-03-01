@@ -85,12 +85,12 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged"
+      "pre-commit": "npx prettier --write ."
     }
   },
   "lint-staged": {
     "*.{js,json,css,md,html}": [
-      "npx prettier --write ."
+      "prettier --single-quote --write"
     ]
   }
 }

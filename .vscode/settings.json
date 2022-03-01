@@ -18,35 +18,5 @@
   },
   "typescript.referencesCodeLens.enabled": true,
   "appService.zipIgnorePattern": [".vscode{,/**}"],
-  "appService.deploySubpath": "",
-  "sqltools.connections": [
-    {
-      "mssqlOptions": {
-        "appName": "SQLTools",
-        "useUTC": true,
-        "encrypt": true
-      },
-      "previewLimit": 50,
-      "server": "localhost",
-      "port": 1433,
-      "askForPassword": true,
-      "driver": "MSSQL",
-      "name": "Josh-SafeKnightBackend",
-      "connectString": "Driver={ODBC Driver 13 for SQL Server};Server=tcp:safeknighttestjosh.database.windows.net,1433;Database=SafeKnightBackend;Uid=josh;Pwd=Flask!!8;Encrypt=yes;TrustServerCertificate=no;Connection Timeout=30;"
-    },
-    {
-      "mssqlOptions": {
-        "appName": "SQLTools",
-        "useUTC": true,
-        "encrypt": true
-      },
-      "previewLimit": 50,
-      "server": "localhost",
-      "port": 1433,
-      "askForPassword": true,
-      "driver": "MSSQL",
-      "name": "SafeKnightDB",
-      "connectString": "Driver={ODBC Driver 13 for SQL Server};Server=tcp:safeknight.database.windows.net,1433;Database=SafeKnightAPI_DB;Uid=SafeKnightDB;Pwd=Flask8!!;Encrypt=yes;TrustServerCertificate=yes;Connection Timeout=30;Driver={ODBC Driver 13 for SQL Server};Server=tcp:safeknight.database.windows.net,1433;Database=SafeKnightAPI_DB;Uid=SafeKnightDB;Pwd=Flask8!!;Encrypt=yes;TrustServerCertificate=yes;Connection Timeout=30;"
-    }
-  ]
+  "appService.deploySubpath": ""
 }

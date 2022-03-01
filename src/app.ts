@@ -23,17 +23,17 @@ app.use(xss());
 
 //Exposing public facing assets to users (currently nothing)
 app.use(
-    express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }),
+  express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 }),
 );
 
 //Below sets up the ApiV1Router
 app.use('/api/v1', apiV1Router);
 
 app.all('*', (_, res) => {
-    res.status(404).json({
-        type: 'error',
-        message: 'The API endpoint is not valid',
-    });
+  res.status(404).json({
+    type: 'error',
+    message: 'The API endpoint is not valid',
+  });
 });
 
 export default app;
