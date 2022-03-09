@@ -8,19 +8,6 @@ if (process.env.NODE_ENV === 'DEVELOPMENT') {
   app.use(morgan('dev'));
 }
 
-(async function () {
-  try {
-    await sql.connect(config);
-    console.log('Connection to SQL Server was successful');
-  } catch (err) {
-    console.log('Connection to SQL server failed!', err);
-  }
-})();
-
-sql.on('error', (err: any) => {
-  console.log('Connection to SQL server failed!', err);
-});
-
 /**
  * Start Express server.
  */
