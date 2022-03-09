@@ -27,12 +27,14 @@ app.use(
 );
 
 //Below sets up the ApiV1Router
-app.use('/api/v1', apiV1Router);
+app.use('/v1', apiV1Router);
 
-app.all('*', (_, res) => {
+app.all('*', (req, res) => {
   res.status(404).json({
-    type: 'error',
+    type: 'errors',
     message: 'The API endpoint is not valid',
+    test: '2',
+    current: req.protocol + '://' + req.get('host') + req.originalUrl,
   });
 });
 
