@@ -1,68 +1,39 @@
 import dbHelpers from '../../helpers/dbHelpers';
 import AppError from '../../interfaces/AppError';
 import { validOrganizationEmail } from '../auth/validateEmail';
-
+import userModel from '../../../../db/user';
 //* Generic function for get all data associated to a user
 type GET_QUERY_PARAMETER_TYPE = 'USERNAME' | 'EMAIL' | 'ID';
 export const getUserData = async (
   identifier: string,
   type: GET_QUERY_PARAMETER_TYPE = 'EMAIL',
-  field = '*',
   returnStrippedData = false,
 ): Promise<any> => {
-  let QUERY;
-  switch (type) {
-    case 'USERNAME':
-      QUERY = `SELECT ${field} FROM users WHERE username='${identifier}'`;
-      break;
-    case 'ID':
-      QUERY = `SELECT ${field} FROM users WHERE id='${identifier}'`;
-      break;
-    default:
-      QUERY = `SELECT ${field} FROM users WHERE email='${identifier}'`;
-  }
-  const userResult = await dbHelpers.getQuery(QUERY);
-  if (userResult.status == dbHelpers.APIStatus.Failed) {
+  let userData;
+  try {
+    if (type === 'EMAIL') {
+      userData = await userModel.findOne({ email: identifier }).exec();
+    } else if (type === 'USERNAME') {
+      userData = await userModel.findOne({ username: identifier }).exec();
+    } else {
+      userData = await userModel.findOne({ id: identifier }).exec();
+    }
+  } catch (e) {
     throw new AppError('Failed finding user details', 400);
   }
-  //Below parameter is if you want to be lazy and just return the NON-Sensitive user back to the frontend.
-  if (returnStrippedData) {
-    const userData = userResult.data[0];
-    const userDataToReturn = {
-      firstName: userData.forename,
-      lastName: userData.surname,
-      username: userData.username,
-      email: userData.email,
-      emailVerified: Boolean(userData.email_verification),
-      organizationEmail: userData.organizational_email,
-      organizationalEmailVerified: Boolean(
-        userData.organizational_email_verification,
-      ),
-      dob: userData.email,
-      gender: userData.gender,
-      profilePic: userData.profile_pic_seed,
-      publicProfile: userData.public_profile,
-      number: userData.number,
-      recentLng: userData.recent_lng,
-      recentLat: userData.recent_lat,
-    };
-    return userDataToReturn;
-  }
-  return userResult.data[0];
+  return userData;
 };
 
 //* Generic function for getting user ID
 export const getUserId = async (
   identifier: string,
   type: GET_QUERY_PARAMETER_TYPE = 'USERNAME',
-): Promise<any> => {
-  const QUERY =
-    type === 'USERNAME'
-      ? `SELECT id FROM users WHERE username='${identifier}'`
-      : `SELECT id FROM users WHERE email='${identifier}'`;
-  const userResult = await dbHelpers.getQuery(QUERY);
-  //Depending on parameter type return either the ID or null
-  return userResult.empty ? null : userResult.data[0].id;
+): Promise<string | null> => {
+  if (type == 'ID') {
+    return identifier;
+  }
+  const userData = await getUserData(identifier, type);
+  return userData === null ? null : userData.id;
 };
 
 //* Add an org email to a given user

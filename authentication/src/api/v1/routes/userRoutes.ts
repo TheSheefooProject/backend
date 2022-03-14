@@ -1,6 +1,5 @@
 import express from 'express';
 import {
-  associateOrgEmailToUser,
   checkUsernameExists,
   getUserDetails,
   updateUserDetails,
@@ -9,9 +8,6 @@ import {
 import { requireAuthenticatedUser } from '../middleware/requireAuthenticatedUser';
 
 const userRouter = express.Router();
-userRouter
-  .route('/org')
-  .post(requireAuthenticatedUser, associateOrgEmailToUser);
 
 userRouter.route('/:username').get(checkUsernameExists);
 
