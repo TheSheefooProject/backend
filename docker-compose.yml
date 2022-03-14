@@ -20,6 +20,8 @@ services:
       dockerfile: 'Dockerfile'
     env_file:
       - ./authentication/.env
+    environment:
+      - NODE_ENV='PRODUCTION'
     restart: always
     depends_on:
       - authentication-db
@@ -28,8 +30,11 @@ services:
   authentication-db:
     restart: always
     image: mongo
-    ports:
-      - '2'
+    env_file:
+      - ./authentication/.env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
 
-  authentication-cache:
-    image: redis
+  # authentication-cache:
+  #   image: redis

@@ -1,25 +1,16 @@
 import { NextFunction, Request, Response } from 'express';
 import AppError from '../interfaces/AppError';
-import {
-  generateSaltedAndHashedPassword,
-  invalidateUserSession,
-} from '../models/auth/user';
+import { generateSaltedAndHashedPassword } from '../models/auth/user';
 import {
   sendVerificationEmail,
   validOrganizationEmail,
 } from '../models/auth/validateEmail';
 import {
-  addOrgEmail,
   deleteUserFromUserTable,
   getUserData,
   getUserId,
   updateUserDetailsInDB,
 } from '../models/user';
-import {
-  validateEmail,
-  validateUsername,
-} from '../validators/userValidator/general';
-import userModel from '../../../db/user';
 import { updateUserDetailsValidator } from '../validators/userValidator/updateUserDetailsValidator';
 
 /**
@@ -46,32 +37,6 @@ export const checkUsernameExists = async (
     return;
   }
 };
-
-// export const checkUser = async (
-//   req: Request,
-//   res: Response,
-//   next: NextFunction,
-// ): Promise<void> => {
-//   try {
-//     const test = new userModel({
-//       username: 'testy',
-//       password: 'testy2',
-//       email: 'test@gmail.com',
-//       verified_email: false,
-//       first_name: 'test',
-//       last_name: 'test2',
-//       profile_pic_url: 'google.com',
-//       reset_verification_code: ['1', '2', '3', '4'],
-//     });
-//     await test.save();
-//     res
-//       .status(200)
-//       .json({ status: 'success', message: 'Database entry added' });
-//   } catch (e) {
-//     next(e);
-//     return;
-//   }
-// };
 
 /**
  * Get the user

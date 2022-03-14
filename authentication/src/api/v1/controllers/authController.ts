@@ -42,17 +42,8 @@ export const register = async (
 ): Promise<void> => {
   try {
     // Below function also throws error if needed
-    const {
-      firstName,
-      lastName,
-      number,
-      gender,
-      username,
-      email,
-      password,
-      dob,
-      profilePicSeed,
-    } = validateRegistrationFields(req);
+    const { firstName, lastName, username, email, password } =
+      validateRegistrationFields(req);
 
     const isUsernameNotUnique = await getUserId(username, 'USERNAME');
     if (isUsernameNotUnique) {
@@ -67,13 +58,9 @@ export const register = async (
     const userData = await createUser(
       firstName,
       lastName,
-      number,
-      gender,
       username,
       email,
       password,
-      dob,
-      profilePicSeed,
     );
     if (!userData) {
       throw new AppError(
@@ -81,26 +68,23 @@ export const register = async (
         409,
       );
     }
-    const userID = await getUserId(email, 'EMAIL');
-    const orgEmail = validOrganizationEmail(email);
-    await sendVerificationEmail(
-      email,
-      req.headers.host,
-      userID,
-      orgEmail ? 'BOTH' : 'PERSONAL',
-    );
+    //TODO! Setup conformation email details.
+    // const userID = await getUserId(email, 'EMAIL');
+    // const orgEmail = validOrganizationEmail(email);
+    // await sendVerificationEmail(
+    //   email,
+    //   req.headers.host,
+    //   userID,
+    //   orgEmail ? 'BOTH' : 'PERSONAL',
+    // );
 
     res.status(200).json({
       status: 'success',
       user: {
         firstName,
         lastName,
-        number,
-        gender,
         username,
         email,
-        dob,
-        profilePicSeed,
       },
     });
   } catch (e) {

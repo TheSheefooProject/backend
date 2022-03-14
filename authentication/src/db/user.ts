@@ -33,6 +33,14 @@ const userSchema = new Schema(
     reset_verification_code: {
       type: Array,
     },
+    session_id: {
+      type: Number,
+      default: 0,
+    },
+    session_valid: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true, id: true },
 );
