@@ -3,6 +3,7 @@ import dbHelpers from '../../helpers/dbHelpers';
 import AppError from '../../interfaces/AppError';
 import { Gender } from '../../interfaces/user';
 import { getUserData } from '../user';
+import userModel from '../../../../db/user';
 const PASSWORD_SALT_SIZE = 10;
 
 export const generateSaltedAndHashedPassword = async (
@@ -16,32 +17,24 @@ export const generateSaltedAndHashedPassword = async (
 export const createUser = async (
   forename: string,
   surname: string,
-  number: string,
-  gender: Gender,
   username: string,
   email: string,
   passwordHash: string,
-  dob: Date,
-  profilePicSeed: string,
 ): Promise<boolean> => {
   const passwordHashedAndSalted = await generateSaltedAndHashedPassword(
     passwordHash,
   );
-  const DB_QUERY = `INSERT INTO users 
-                (forename, surname, username, number, email, password, profile_pic_seed, dob, gender)
-            VALUES (
-                '${forename}', 
-                '${surname}',
-                '${username}',
-                '${number}',
-                '${email}',
-                '${passwordHashedAndSalted}',
-                '${profilePicSeed}',
-                '${dob}',
-                '${gender}'
-             ) `;
-  const result = await dbHelpers.updateQuery(DB_QUERY);
-  if (result.status === dbHelpers.APIStatus.Failed) {
+  const newUserClass = new userModel({
+    username: username,
+    password: passwordHashedAndSalted,
+    email: email,
+    verified_email: false,
+    first_name: forename,
+    last_name: surname,
+  });
+  try {
+    await newUserClass.save();
+  } catch (e) {
     return false;
   }
   return true;

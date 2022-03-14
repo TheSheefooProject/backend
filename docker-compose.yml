@@ -1,5 +1,6 @@
 version: '3'
 services:
+############## Methods associated with serving files ##############
   reverse-proxy:
     build:
       context: ./reverse-proxy
@@ -11,21 +12,29 @@ services:
       - ./reverse-proxy/nginx.conf:/etc/nginx/nginx.conf
     ports:
       - 80:80
+
+############## Methods associated with user authentication ##############
   authentication-server:
     build: 
       context: ./authentication
       dockerfile: 'Dockerfile'
     env_file:
       - ./authentication/.env
+    environment:
+      - NODE_ENV='PRODUCTION'
     restart: always
     depends_on:
       - authentication-db
+      - authentication-cache
 
   authentication-db:
     restart: always
     image: mongo
-    ports:
-      - '2'
+    env_file:
+      - ./authentication/.env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
 
   # authentication-cache:
-  #   image: 
+  #   image: redis

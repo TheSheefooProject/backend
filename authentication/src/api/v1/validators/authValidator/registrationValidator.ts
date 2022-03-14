@@ -16,24 +16,16 @@ export const validateRegistrationFields = (req: Request) => {
   const {
     firstName: firstNameRaw,
     lastName: lastNameRaw,
-    number: numberRaw,
-    gender: genderRaw,
     username: usernameRaw,
     email: emailRaw,
     password: passwordRaw,
-    dob: dobRaw,
-    profilePicSeed,
   } = req.body;
 
   const emailObject = validateEmail(emailRaw);
   const firstNameObject = validateName(firstNameRaw);
   const lastNameObject = validateName(lastNameRaw, 'LAST');
-  const numberObject = validatePhoneNumber(numberRaw);
   const usernameObject = validateUsername(usernameRaw);
-  const dobObject = validateDOB(dobRaw);
-  const genderObject = validateGender(genderRaw);
   const passwordObject = validatePassword(passwordRaw);
-  const profilePicSeedObject = validateProfilePic(profilePicSeed);
 
   if (!emailObject.valid) {
     error.push(emailObject.error);
@@ -50,15 +42,6 @@ export const validateRegistrationFields = (req: Request) => {
   if (!passwordObject.valid) {
     error.push(passwordObject.error);
   }
-  if (!numberObject.valid) {
-    error.push(numberObject.error);
-  }
-  if (!dobObject.valid) {
-    error.push(dobObject.error);
-  }
-  if (!profilePicSeedObject.valid) {
-    error.push(profilePicSeedObject.error);
-  }
 
   if (error.length > 0) {
     throw new AppError(
@@ -70,13 +53,9 @@ export const validateRegistrationFields = (req: Request) => {
   return {
     firstName: firstNameRaw,
     lastName: lastNameRaw,
-    number: numberRaw,
-    gender: genderObject.value,
     username: usernameRaw,
     email: emailRaw,
     password: passwordRaw,
-    dob: dobRaw,
-    profilePicSeed,
   };
 };
 

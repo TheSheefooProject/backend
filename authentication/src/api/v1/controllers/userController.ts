@@ -1,55 +1,17 @@
 import { NextFunction, Request, Response } from 'express';
 import AppError from '../interfaces/AppError';
-import {
-  generateSaltedAndHashedPassword,
-  invalidateUserSession,
-} from '../models/auth/user';
+import { generateSaltedAndHashedPassword } from '../models/auth/user';
 import {
   sendVerificationEmail,
   validOrganizationEmail,
 } from '../models/auth/validateEmail';
 import {
-  addOrgEmail,
   deleteUserFromUserTable,
   getUserData,
   getUserId,
   updateUserDetailsInDB,
 } from '../models/user';
-import {
-  validateEmail,
-  validateUsername,
-} from '../validators/userValidator/general';
 import { updateUserDetailsValidator } from '../validators/userValidator/updateUserDetailsValidator';
-
-export const associateOrgEmailToUser = async (
-  req: Request,
-  res: Response,
-  next: NextFunction,
-): Promise<void> => {
-  try {
-    // Ensure the email is valid
-    const orgEmailRaw = req.body.organizationEmail;
-    const validatedEmailObj = validateEmail(orgEmailRaw);
-    if (!validatedEmailObj.valid) {
-      throw new AppError(validatedEmailObj.error, 402);
-    }
-    //Update the database with proposed org email
-    await addOrgEmail(req.user.id, validatedEmailObj.value);
-    await sendVerificationEmail(
-      validatedEmailObj.value,
-      req.headers.host,
-      req.user.id,
-      'ORGANIZATIONAL',
-    );
-
-    res
-      .status(200)
-      .json({ status: 'success', message: 'Verification email sent' });
-  } catch (e) {
-    next(e);
-    return;
-  }
-};
 
 /**
  * Get the user
@@ -62,7 +24,7 @@ export const checkUsernameExists = async (
 ): Promise<void> => {
   try {
     const { username } = req.params;
-    validateUsername(username);
+    // validateUsername(username);
     const isUsernameNotUnique = await getUserId(username, 'USERNAME');
     if (isUsernameNotUnique) {
       throw new AppError('Username is taken by another account', 403);
@@ -86,7 +48,7 @@ export const getUserDetails = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const userData = await getUserData(req.user.id, 'ID', '*', true);
+    const userData = await getUserData(req.user.id, 'ID', true);
     res.status(200).json({ status: 'success', userData });
   } catch (e) {
     next(e);
@@ -196,7 +158,6 @@ export const deleteUser = async (
 export default {
   getUserDetails,
   checkUsernameExists,
-  associateOrgEmailToUser,
   deleteUser,
   updateUserDetails,
 };
