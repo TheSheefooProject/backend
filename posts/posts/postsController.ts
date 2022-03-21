@@ -1,32 +1,126 @@
-import AppError from '../../authentication/src/api/v1/interfaces/AppError'
-import { NextFunction, Request, Response } from 'express';
-import posts from './posts';
+import AppError from "../../authentication/src/api/v1/interfaces/AppError";
+import { NextFunction, Request, Response } from "express";
+import posts from "./posts";
 
-export const validatePostFields=(req: Request) =>{
-    const error = [];
+interface validationStatus {
+  valid: boolean;
+  error: string;
+  value?: any;
+}
+
+export const validateTitle = (
+  titleRaw: string,
+  typeValidation: string
+): validationStatus => {
+  let error: string;
+  if (!titleRaw) {
+    return {
+      valid: false,
+      error: typeValidation + " is a required field",
+      value: titleRaw,
+    };
+  }
+  if (titleRaw.length < 3 || titleRaw.length > 500) {
+    error = typeValidation + " must be between 3 and 500 characters";
+  }
+  return { valid: !Boolean(error), error, value: titleRaw };
+};
+
+export const validatePostFields = (req: Request) => {
   const {
     author: authorRaw,
-    title: emailRaw,
-    content: passwordRaw,
-    imageURL: imageURLRaw
+    title: titleRaw,
+    content: contentRaw,
+    imageURL: imageURLRaw,
   } = req.body;
-  
-}
 
-export const createPost = async(req: Request, res:Response, next:NextFunction):Promise<void>{
+  const errors = [];
+  const titleErr = validateTitle(titleRaw, "Title");
+  const contentErr = validateTitle(contentRaw, "Content");
+  if (!titleErr.valid) {
+    errors.push(titleErr.error);
+  }
+  if (!contentErr.valid) {
+    errors.push(contentErr.error);
+  }
+  if (errors.length > 0) {
+    throw new AppError(
+      `There were some errors trying to create your post. There were ${errors.length} errors`,
+      401,
+      { validationErrors: errors }
+    );
+  }
+  return {
+    author: authorRaw,
+    title: titleRaw,
+    content: contentRaw,
+    imageURL: imageURLRaw,
+  };
+};
+
+export const createPost = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
     const {
-        title: titleRaw, content: contentRaw, imageURL:imageURLRaw
-    } = req.body;
-try {
-    posts.createPost(req.user, titleRaw, contentRaw, imageURLRaw)
-} catch (error) {
+      title: titleRaw,
+      content: contentRaw,
+      imageURL: imageURLRaw,
+    } = validatePostFields(req.body);
+    const postID = await posts.createPost(
+      req.user,
+      titleRaw,
+      contentRaw,
+      imageURLRaw
+    );
+    res.status(200).json({
+      status: "success",
+      postID: postID,
+    });
+  } catch (error) {
     next(error);
-}
-}
+  }
+};
 
+export const getAnIndividualPost = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  let post;
+  const postID = req.body.post_id;
+  try {
+    post = await posts.getAnIndividualPost(postID);
+  } catch (error) {
+    throw new AppError(`Unable to find post for given ID${postID}`, 404);
+  }
+};
 
-export default{
-    createPost
-}
+export const getAllPosts = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  let allPosts;
+  try {
+    allPosts = await posts.getAllPosts();
+    res.status(200).json({
+      allPosts: allPosts,
+      status: "success",
+    });
+  } catch (error) {
+    next(error);
+    return;
+  }
+};
 
-
+export default {
+  getAllPosts,
+  //   getAnIndividualPost,
+  //   getPostsByAnIndividual,
+  createPost,
+  //   modifyPost,
+  //   deletePost,
+};
