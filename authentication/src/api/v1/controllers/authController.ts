@@ -2,7 +2,9 @@ import bcrypt from 'bcryptjs';
 import { NextFunction, Request, Response } from 'express';
 import path from 'path';
 import {
+  ACCESS_TOKEN_UPDATE_SECONDS,
   ACCESS_TOKEN_UPDATE_TIME,
+  REFRESH_TOKEN_UPDATE_SECONDS,
   REFRESH_TOKEN_UPDATE_TIME,
 } from '../../../config/jwt';
 import AppError from '../interfaces/AppError';
@@ -22,14 +24,10 @@ import {
   invalidateUserSession,
   updateUserPassword,
 } from '../models/auth/user';
-import {
-  sendVerificationEmail,
-  updateVerifiedEmail,
-  validOrganizationEmail,
-} from '../models/auth/validateEmail';
+import { updateVerifiedEmail } from '../models/auth/validateEmail';
 import { getUserData, getUserId } from '../models/user';
-import { validateRegistrationFields } from '../validators/authValidator/registrationValidator';
 import { validateForgotPasswordValidator } from '../validators/authValidator/forogtPasswordValidator';
+import { validateRegistrationFields } from '../validators/authValidator/registrationValidator';
 import { validatePassword } from '../validators/userValidator/general';
 /**
  * Get the servers public key
@@ -145,13 +143,19 @@ export const login = async (
       REFRESH_TOKEN_UPDATE_TIME,
     );
 
-    //* Note: In an ideal world, we would not pass the data back to react native(no cookies? i think)
-    //* but set the cookie, by doing say. This is because you no longer need to pass in values
-    //* and the Access token is stored in a secure cookie, as a result of httpOnly:true.
-    // res.cookie("accessToken", accessToken, {
-    //     maxAge: 300000, // 5 minutes
-    //     httpOnly: true,
-    //   });
+    // //* Note: In an ideal world, we would not pass the data back to react native(no cookies? i think)
+    // //* but set the cookie, by doing say. This is because you no longer need to pass in values
+    // //* and the Access token is stored in a secure cookie, as a result of httpOnly:true.
+    res.cookie('accessToken', accessToken, {
+      maxAge: ACCESS_TOKEN_UPDATE_SECONDS, // 5 minutes
+      httpOnly: true,
+      secure: true,
+    });
+    res.cookie('refreshToken', refreshToken, {
+      maxAge: REFRESH_TOKEN_UPDATE_SECONDS, // 5 minutes
+      httpOnly: true,
+      secure: true,
+    });
     res.status(200).json({
       accessToken,
       refreshToken,
@@ -170,7 +174,6 @@ export const login = async (
 export const verifyEmail = async (
   req: Request,
   res: Response,
-  next: NextFunction,
 ): Promise<void> => {
   //TODO: Create better looking HTML for response websites
   try {
