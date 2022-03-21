@@ -91,7 +91,21 @@ export const getAnIndividualPost = async (
   next: NextFunction,
 ): Promise<void> => {
   let post;
-  const postID = req.body.post_id;
+  const postID = req.params.post_id;
+  try {
+    post = await posts.getAnIndividualPost(postID);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const searchPostByTitle = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  let post;
+  const postID = req.params.post_id;
   try {
     post = await posts.getAnIndividualPost(postID);
   } catch (error) {
@@ -148,11 +162,30 @@ export const modifyPost = async (
   }
 };
 
+export const deletePost = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  const postID = req.body.post_id;
+  try {
+    const allPosts = await posts.deletePost(postID);
+    res.status(200).json({
+      allPosts: allPosts,
+      status: 'success',
+    });
+  } catch (error) {
+    next(error);
+    return;
+  }
+};
+
 export default {
   getAllPosts,
   getAnIndividualPost,
   getPostsByAnIndividual,
   createPost,
-  //   modifyPost,
-  //   deletePost,
+  searchPostByTitle,
+  modifyPost,
+  deletePost,
 };

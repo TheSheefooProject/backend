@@ -5,7 +5,7 @@ import { native as pg } from 'pg';
 require('sequelize-typescript');
 // import { Sequelize } from "sequelize-typescript";
 // import { NextFunction, Request, Response } from "express";
-import { Sequelize, STRING, DATE, INTEGER } from 'sequelize';
+import { Sequelize, STRING, DATE, INTEGER, Op } from 'sequelize';
 import { post } from 'request';
 
 const sequelize = new Sequelize(
@@ -37,6 +37,23 @@ async function getAllPosts() {
   const posts = Post.findAll({
     attributes: ['*'],
     order: [['time_created', 'DESC']],
+  });
+  // const results = await sequelize.query(
+  //   "SELECT * FROM posts order by time_created desc"
+  // );
+  console.log(posts);
+  return posts;
+}
+
+async function SearchAllPostsbyTitle(titleQuery: string) {
+  // const op = Op
+  const posts = Post.findAll({
+    attributes: ['*'],
+    where: {
+      title: {
+        [Op.substring]: titleQuery, // LIKE '%scien%'
+      },
+    },
   });
   // const results = await sequelize.query(
   //   "SELECT * FROM posts order by time_created desc"
@@ -189,6 +206,7 @@ export const modifyPost = async (
 export default {
   getAllPosts,
   getAnIndividualPost,
+  SearchAllPostsbyTitle,
   getPostsByAnIndividual,
   createPost,
   modifyPost,
