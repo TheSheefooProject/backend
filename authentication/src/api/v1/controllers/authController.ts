@@ -194,9 +194,9 @@ export const verifyEmail = async (
       );
       return;
     }
-    const { id, email } = payload;
+    const { id } = payload;
 
-    await updateVerifiedEmail(id, email);
+    await updateVerifiedEmail(id);
 
     res.sendFile(
       path.join(rootFilePath, 'public/views/auth/verifiedEmail.html'),
