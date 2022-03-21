@@ -9,8 +9,8 @@ export const getUserData = async (
   type: GET_QUERY_PARAMETER_TYPE = 'EMAIL',
   returnStrippedData = false,
 ): Promise<any> => {
-  let userData;
   try {
+    let userData;
     if (type === 'EMAIL') {
       userData = await userModel.findOne({ email: identifier }).exec();
     } else if (type === 'USERNAME') {
@@ -18,10 +18,10 @@ export const getUserData = async (
     } else {
       userData = await userModel.findOne({ id: identifier }).exec();
     }
+    return userData;
   } catch (e) {
     throw new AppError('Failed finding user details', 400);
   }
-  return userData;
 };
 
 //* Generic function for getting user ID

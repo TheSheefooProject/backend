@@ -24,7 +24,11 @@ import {
   invalidateUserSession,
   updateUserPassword,
 } from '../models/auth/user';
-import { updateVerifiedEmail } from '../models/auth/validateEmail';
+import {
+  sendVerificationEmail,
+  updateVerifiedEmail,
+  validOrganizationEmail,
+} from '../models/auth/validateEmail';
 import { getUserData, getUserId } from '../models/user';
 import { validateForgotPasswordValidator } from '../validators/authValidator/forogtPasswordValidator';
 import { validateRegistrationFields } from '../validators/authValidator/registrationValidator';
@@ -67,14 +71,8 @@ export const register = async (
       );
     }
     //TODO! Setup conformation email details.
-    // const userID = await getUserId(email, 'EMAIL');
-    // const orgEmail = validOrganizationEmail(email);
-    // await sendVerificationEmail(
-    //   email,
-    //   req.headers.host,
-    //   userID,
-    //   orgEmail ? 'BOTH' : 'PERSONAL',
-    // );
+    const userID = await getUserId(email, 'EMAIL');
+    await sendVerificationEmail(email, req.headers.host, userID);
 
     res.status(200).json({
       status: 'success',
@@ -113,6 +111,9 @@ export const login = async (
       userIdentifier,
       userIdentifier === username ? 'USERNAME' : 'EMAIL',
     );
+    if (!userData) {
+      throw new AppError('Failed finding user details');
+    }
 
     //Check if the user password is correct.
     const checkValid = await bcrypt.compare(password, userData.password);
@@ -161,6 +162,7 @@ export const login = async (
       refreshToken,
     });
   } catch (e) {
+    console.log(e);
     next(e);
     return;
   }
@@ -192,9 +194,9 @@ export const verifyEmail = async (
       );
       return;
     }
-    const { id, email, type } = payload;
+    const { id, email } = payload;
 
-    await updateVerifiedEmail(id, email, type);
+    await updateVerifiedEmail(id, email);
 
     res.sendFile(
       path.join(rootFilePath, 'public/views/auth/verifiedEmail.html'),
