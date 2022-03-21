@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import dbHelpers from '../../helpers/dbHelpers';
 import AppError from '../../interfaces/AppError';
 import { Gender } from '../../interfaces/user';
-import { getUserData } from '../user';
+import { getUserData } from '../../models/user/index';
 import userModel from '../../../../db/user';
 const PASSWORD_SALT_SIZE = 10;
 

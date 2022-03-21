@@ -69,7 +69,7 @@ export const createPost = async (
       content: contentRaw,
       imageURL: imageURLRaw,
     } = validatePostFields(req.body);
-    const user = req.user;
+    const user = String(req.user);
     const postID = await posts.createPost(
       user,
       titleRaw,
