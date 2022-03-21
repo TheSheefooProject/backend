@@ -25,7 +25,7 @@ services:
     restart: always
     depends_on:
       - authentication-db
-      - authentication-cache
+      # - authentication-cache
 
   authentication-db:
     restart: always

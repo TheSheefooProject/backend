@@ -2,7 +2,9 @@ import bcrypt from 'bcryptjs';
 import { NextFunction, Request, Response } from 'express';
 import path from 'path';
 import {
+  ACCESS_TOKEN_UPDATE_SECONDS,
   ACCESS_TOKEN_UPDATE_TIME,
+  REFRESH_TOKEN_UPDATE_SECONDS,
   REFRESH_TOKEN_UPDATE_TIME,
 } from '../../../config/jwt';
 import AppError from '../interfaces/AppError';
@@ -28,8 +30,8 @@ import {
   validOrganizationEmail,
 } from '../models/auth/validateEmail';
 import { getUserData, getUserId } from '../models/user';
-import { validateRegistrationFields } from '../validators/authValidator/registrationValidator';
 import { validateForgotPasswordValidator } from '../validators/authValidator/forogtPasswordValidator';
+import { validateRegistrationFields } from '../validators/authValidator/registrationValidator';
 import { validatePassword } from '../validators/userValidator/general';
 /**
  * Get the servers public key
@@ -69,14 +71,8 @@ export const register = async (
       );
     }
     //TODO! Setup conformation email details.
-    // const userID = await getUserId(email, 'EMAIL');
-    // const orgEmail = validOrganizationEmail(email);
-    // await sendVerificationEmail(
-    //   email,
-    //   req.headers.host,
-    //   userID,
-    //   orgEmail ? 'BOTH' : 'PERSONAL',
-    // );
+    const userID = await getUserId(email, 'EMAIL');
+    await sendVerificationEmail(email, req.headers.host, userID);
 
     res.status(200).json({
       status: 'success',
@@ -115,6 +111,9 @@ export const login = async (
       userIdentifier,
       userIdentifier === username ? 'USERNAME' : 'EMAIL',
     );
+    if (!userData) {
+      throw new AppError('Failed finding user details');
+    }
 
     //Check if the user password is correct.
     const checkValid = await bcrypt.compare(password, userData.password);
@@ -145,18 +144,25 @@ export const login = async (
       REFRESH_TOKEN_UPDATE_TIME,
     );
 
-    //* Note: In an ideal world, we would not pass the data back to react native(no cookies? i think)
-    //* but set the cookie, by doing say. This is because you no longer need to pass in values
-    //* and the Access token is stored in a secure cookie, as a result of httpOnly:true.
-    // res.cookie("accessToken", accessToken, {
-    //     maxAge: 300000, // 5 minutes
-    //     httpOnly: true,
-    //   });
+    // //* Note: In an ideal world, we would not pass the data back to react native(no cookies? i think)
+    // //* but set the cookie, by doing say. This is because you no longer need to pass in values
+    // //* and the Access token is stored in a secure cookie, as a result of httpOnly:true.
+    res.cookie('accessToken', accessToken, {
+      maxAge: ACCESS_TOKEN_UPDATE_SECONDS, // 5 minutes
+      httpOnly: true,
+      secure: true,
+    });
+    res.cookie('refreshToken', refreshToken, {
+      maxAge: REFRESH_TOKEN_UPDATE_SECONDS, // 5 minutes
+      httpOnly: true,
+      secure: true,
+    });
     res.status(200).json({
       accessToken,
       refreshToken,
     });
   } catch (e) {
+    console.log(e);
     next(e);
     return;
   }
@@ -170,7 +176,6 @@ export const login = async (
 export const verifyEmail = async (
   req: Request,
   res: Response,
-  next: NextFunction,
 ): Promise<void> => {
   //TODO: Create better looking HTML for response websites
   try {
@@ -189,9 +194,9 @@ export const verifyEmail = async (
       );
       return;
     }
-    const { id, email, type } = payload;
+    const { id } = payload;
 
-    await updateVerifiedEmail(id, email, type);
+    await updateVerifiedEmail(id);
 
     res.sendFile(
       path.join(rootFilePath, 'public/views/auth/verifiedEmail.html'),

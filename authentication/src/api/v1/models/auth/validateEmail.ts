@@ -6,6 +6,7 @@ import {
 } from '../../../../config/email';
 import { signJWT } from './jwt';
 import dbHelpers from '../../helpers/dbHelpers';
+import User from '../../../../db/user';
 
 export const validOrganizationEmail = (email: string): boolean => {
   const emailSuffix = email && email.split('@')[1];
@@ -13,58 +14,39 @@ export const validOrganizationEmail = (email: string): boolean => {
 };
 
 //* Below methods are for verification email generation
-type EmailType = 'ORGANIZATIONAL' | 'PERSONAL' | 'BOTH';
 export const sendVerificationEmail = async (
   emailToSendTo: string,
-  currentHostname = 'https://www.safeknight.app',
+  currentHostname = 'http://localhost:3000',
   userID: string,
-  type: EmailType = 'ORGANIZATIONAL',
 ): Promise<void> => {
   SendGrid.setApiKey(process.env.SEND_GRID_API);
   try {
     const verificationToken = signJWT(
-      { id: userID, type, email: emailToSendTo },
+      { id: userID, email: emailToSendTo },
       `${FORGOT_EMAIL_EXPIRY_TIME}s`,
     );
     const msg = {
       to: emailToSendTo,
-      from: 'no-reply@safeknight.app',
-      subject: 'SafeKnight Email Verification',
-      templateId: 'd-029a2970c2894ee0987bd20d8d5941d4',
+      from: 'sheefooapphelp@outlook.com',
+      subject: 'Sheefoo Email Verification',
+      templateId: 'd-4cdad35446c545388daeecd7c1dabd0b',
       dynamicTemplateData: {
-        verifyEmailUrl: `https://www.${currentHostname}/api/v1/auth/verifyemail/${verificationToken}`,
+        verifyEmailUrl: `http://www.${currentHostname}${currentHostname}/api/v1/auth/verifyemail/${verificationToken}`,
       },
     };
     await SendGrid.send(msg);
   } catch (e) {
+    console.log(e);
     throw new AppError('Failed sending verification email');
   }
 };
 
 //* Below methods for updating DB of verified state
-export const updateVerifiedEmail = async (
-  id: string,
-  email: string,
-  type: EmailType,
-): Promise<void> => {
-  let UPDATE_QUERY;
-  switch (type) {
-    case 'BOTH':
-      UPDATE_QUERY = `UPDATE users SET email_verification=${1}, organizational_email_verification=${1}, organizational_email='${email}' WHERE id='${id}'`;
-      break;
-    case 'PERSONAL':
-      UPDATE_QUERY = `UPDATE users SET email_verification=${1} WHERE id='${id}'`;
-      break;
-    case 'ORGANIZATIONAL':
-      UPDATE_QUERY = `UPDATE users SET organizational_email_verification=${1} WHERE id='${id}'`;
-      break;
-    default:
-      UPDATE_QUERY = `UPDATE users SET organizational_email_verification=${1} where id='${id}'`;
-      break;
-  }
-  const updateQuery = await dbHelpers.updateQuery(UPDATE_QUERY);
-  if (updateQuery.status == dbHelpers.APIStatus.Failed) {
-    throw new AppError('Internal server error verifying email');
+export const updateVerifiedEmail = async (id: string): Promise<void> => {
+  try {
+    await User.findOneAndUpdate({ id }, { verified_email: true });
+  } catch (e) {
+    throw new AppError('Failed verifying users email');
   }
 };
 
