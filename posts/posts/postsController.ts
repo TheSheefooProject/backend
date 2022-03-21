@@ -94,7 +94,7 @@ export const getAnIndividualPost = async (
   try {
     post = await posts.getAnIndividualPost(postID);
   } catch (error) {
-    throw new AppError(`Unable to find post for given ID${postID}`, 404);
+    next(error);
   }
 };
 

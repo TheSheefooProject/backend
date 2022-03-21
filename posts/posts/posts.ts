@@ -1,4 +1,5 @@
 // library for postgres 0.0.0.0:5432
+import AppError from "../../authentication/src/api/v1/interfaces/AppError";
 import dbConfigPosts from "../db.config";
 // import { Sequelize } from "sequelize-typescript";
 // import { NextFunction, Request, Response } from "express";
@@ -87,7 +88,7 @@ export const createPost = async (
     },
   });
   if (postExists) {
-    throw new Error("Post already exists");
+    throw new AppError(`Post already exists`, 500);
   }
   // let query;
   if (imageURL === "") {
