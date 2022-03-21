@@ -1,5 +1,5 @@
 // library for postgres 0.0.0.0:5432
-import dbConfig from "./db.config";
+import dbConfig from "../db.config";
 import { Sequelize } from "sequelize-typescript";
 // import { NextFunction, Request, Response } from "express";
 
