@@ -3,7 +3,9 @@ import dbHelpers from '../../helpers/dbHelpers';
 import AppError from '../../interfaces/AppError';
 import { Gender } from '../../interfaces/user';
 import { getUserData } from '../user';
+import User from '../../../../db/user';
 import userModel from '../../../../db/user';
+import mongoose from 'mongoose';
 const PASSWORD_SALT_SIZE = 10;
 
 export const generateSaltedAndHashedPassword = async (
@@ -48,11 +50,12 @@ export const createUserSession = async (email: string): Promise<number> => {
   const userData = await getUserData(email);
   const newSessionID = userData.session_id + 1;
   // 1 represents valid, since schema has boolean for that field
-  const UPDATE_QUERY = `UPDATE users SET session_id=${newSessionID}, session_valid=${1} where id='${
-    userData.id
-  }'`;
-  const updateQuery = await dbHelpers.updateQuery(UPDATE_QUERY);
-  if (updateQuery.status === dbHelpers.APIStatus.Failed) {
+  try {
+    await User.findOneAndUpdate(
+      { id: userData.id },
+      { session_id: newSessionID, session_valid: true },
+    );
+  } catch (e) {
     throw new AppError('Failed authorizing user.');
   }
   return newSessionID;

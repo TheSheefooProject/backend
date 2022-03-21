@@ -1,6 +1,9 @@
 export const REFRESH_TOKEN_UPDATE_TIME = '1y';
 export const ACCESS_TOKEN_UPDATE_TIME = '43200s'; //Equates to half a day
 
+export const ACCESS_TOKEN_UPDATE_SECONDS = 43200;
+export const REFRESH_TOKEN_UPDATE_SECONDS = 31536000;
+
 export const privateKeyForTesting = `
 -----BEGIN RSA PRIVATE KEY-----
 MIIJKQIBAAKCAgEAx4MryzupE/h8PhrhHidaW3ISeSrVEOHnmLNWsgs2n0B1Opsh
