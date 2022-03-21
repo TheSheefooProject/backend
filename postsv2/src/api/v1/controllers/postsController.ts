@@ -1,6 +1,6 @@
-import AppError from "../../authentication/src/api/v1/interfaces/AppError";
-import { NextFunction, Request, Response } from "express";
-import posts from "./posts";
+import AppError from '../interfaces/AppError';
+import { NextFunction, Request, Response } from 'express';
+import posts from '../models/posts/posts';
 
 interface validationStatus {
   valid: boolean;
@@ -10,18 +10,18 @@ interface validationStatus {
 
 export const validateTitle = (
   titleRaw: string,
-  typeValidation: string
+  typeValidation: string,
 ): validationStatus => {
   let error: string;
   if (!titleRaw) {
     return {
       valid: false,
-      error: typeValidation + " is a required field",
+      error: typeValidation + ' is a required field',
       value: titleRaw,
     };
   }
   if (titleRaw.length < 3 || titleRaw.length > 500) {
-    error = typeValidation + " must be between 3 and 500 characters";
+    error = typeValidation + ' must be between 3 and 500 characters';
   }
   return { valid: !Boolean(error), error, value: titleRaw };
 };
@@ -35,8 +35,8 @@ export const validatePostFields = (req: Request) => {
   } = req.body;
 
   const errors = [];
-  const titleErr = validateTitle(titleRaw, "Title");
-  const contentErr = validateTitle(contentRaw, "Content");
+  const titleErr = validateTitle(titleRaw, 'Title');
+  const contentErr = validateTitle(contentRaw, 'Content');
   if (!titleErr.valid) {
     errors.push(titleErr.error);
   }
@@ -47,7 +47,7 @@ export const validatePostFields = (req: Request) => {
     throw new AppError(
       `There were some errors trying to create your post. There were ${errors.length} errors`,
       401,
-      { validationErrors: errors }
+      { validationErrors: errors },
     );
   }
   return {
@@ -61,7 +61,7 @@ export const validatePostFields = (req: Request) => {
 export const createPost = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   try {
     const {
@@ -69,14 +69,15 @@ export const createPost = async (
       content: contentRaw,
       imageURL: imageURLRaw,
     } = validatePostFields(req.body);
+    const user = req.user;
     const postID = await posts.createPost(
-      req.user,
+      user,
       titleRaw,
       contentRaw,
-      imageURLRaw
+      imageURLRaw,
     );
     res.status(200).json({
-      status: "success",
+      status: 'success',
       postID: postID,
     });
   } catch (error) {
@@ -87,7 +88,7 @@ export const createPost = async (
 export const getAnIndividualPost = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   let post;
   const postID = req.body.post_id;
@@ -101,7 +102,7 @@ export const getAnIndividualPost = async (
 export const getPostsByAnIndividual = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   let post;
   const userID = req.body.userID;
@@ -114,14 +115,14 @@ export const getPostsByAnIndividual = async (
 export const getAllPosts = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   let allPosts;
   try {
     allPosts = await posts.getAllPosts();
     res.status(200).json({
       allPosts: allPosts,
-      status: "success",
+      status: 'success',
     });
   } catch (error) {
     next(error);
@@ -132,14 +133,14 @@ export const getAllPosts = async (
 export const modifyPost = async (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ): Promise<void> => {
   let allPosts;
   try {
     allPosts = await posts.getAllPosts();
     res.status(200).json({
       allPosts: allPosts,
-      status: "success",
+      status: 'success',
     });
   } catch (error) {
     next(error);
