@@ -4,8 +4,6 @@ import dbConfigPosts from '../../../../config/dbConfigPosts';
 
 require('sequelize-typescript');
 import { Sequelize, STRING, DATE, INTEGER, Op } from 'sequelize';
-import { Length } from 'sequelize-typescript';
-// import { post } from 'request';
 
 const sequelize = new Sequelize(
   dbConfigPosts.DB,
@@ -40,15 +38,11 @@ async function getAllPosts() {
     attributes: ['*'],
     order: [['time_created', 'DESC']],
   });
-  // const results = await sequelize.query(
-  //   "SELECT * FROM posts order by time_created desc"
-  // );
   console.log(posts);
   return posts;
 }
 
 async function SearchAllPostsbyTitle(titleQuery: string) {
-  // const op = Op
   const posts = Post.findAll({
     attributes: ['*'],
     where: {
@@ -57,15 +51,11 @@ async function SearchAllPostsbyTitle(titleQuery: string) {
       },
     },
   });
-  // const results = await sequelize.query(
-  //   "SELECT * FROM posts order by time_created desc"
-  // );
   console.log(posts);
   return posts;
 }
 
 async function SearchAllPostsbyHashtag(hashtag: string) {
-  // const op = Op
   const posts = Post.findAll({
     attributes: ['*'],
     where: {
@@ -84,9 +74,6 @@ async function SearchAllPostsbyHashtag(hashtag: string) {
       ],
     },
   });
-  // const results = await sequelize.query(
-  //   "SELECT * FROM posts order by time_created desc"
-  // );
   console.log(posts);
   return posts;
 }
@@ -96,21 +83,11 @@ async function getAnIndividualPost(postID: string) {
     attributes: ['*'],
     where: { post_id: postID },
   });
-  // const query =
-  //   "SELECT * FROM posts where post_id=" +
-  //   postID +
-  //   " order by time_created desc";
-  // const results = await sequelize.query(query);
   console.log(results);
   return results;
 }
 
 async function getPostsByAnIndividual(userID: string) {
-  // const query =
-  //   "SELECT * FROM posts where author=" +
-  //   userID +
-  //   " order by time_created desc";
-  // const results = await sequelize.query(query);
   const results = Post.findAll({
     attributes: ['*'],
     where: { author: userID },
@@ -143,7 +120,6 @@ export const createPost = async (
   if (postExists) {
     throw new AppError('Post already exists', 500);
   }
-  // let query;
   if (imageURL === '') {
     newPost = await Post.create(
       {
