@@ -1,12 +1,11 @@
 // library for postgres 0.0.0.0:5432
 import AppError from '../../interfaces/AppError';
 import dbConfigPosts from '../../../../config/dbConfigPosts';
-import { native as pg } from 'pg';
+
 require('sequelize-typescript');
-// import { Sequelize } from "sequelize-typescript";
-// import { NextFunction, Request, Response } from "express";
 import { Sequelize, STRING, DATE, INTEGER, Op } from 'sequelize';
-import { post } from 'request';
+import { Length } from 'sequelize-typescript';
+// import { post } from 'request';
 
 const sequelize = new Sequelize(
   dbConfigPosts.DB,
@@ -31,6 +30,9 @@ const Post = sequelize.define('post', {
   content: STRING,
   time_created: DATE,
   image_url: STRING,
+  first_hashtag: STRING,
+  second_hashtag: STRING,
+  third_hashtag: STRING,
 });
 
 async function getAllPosts() {
@@ -53,6 +55,33 @@ async function SearchAllPostsbyTitle(titleQuery: string) {
       title: {
         [Op.substring]: titleQuery, // LIKE '%scien%'
       },
+    },
+  });
+  // const results = await sequelize.query(
+  //   "SELECT * FROM posts order by time_created desc"
+  // );
+  console.log(posts);
+  return posts;
+}
+
+async function SearchAllPostsbyHashtag(hashtag: string) {
+  // const op = Op
+  const posts = Post.findAll({
+    attributes: ['*'],
+    where: {
+      [Op.or]: [
+        {
+          first_hashtag: {
+            [Op.substring]: hashtag, // LIKE '%scien%'
+          },
+          second_hashtag: {
+            [Op.substring]: hashtag, // LIKE '%scien%'
+          },
+          third_hashtag: {
+            [Op.substring]: hashtag, // LIKE '%scien%'
+          },
+        },
+      ],
     },
   });
   // const results = await sequelize.query(
@@ -95,6 +124,9 @@ export const createPost = async (
   author: string,
   title: string,
   content: string,
+  first_hashtag: string,
+  second_hashtag: string,
+  third_hashtag: string,
   imageURL?: string,
 ): Promise<string> => {
   const curtime = Date.now();
@@ -119,6 +151,9 @@ export const createPost = async (
         title: title,
         content: content,
         time_created: curtime,
+        first_hashtag: first_hashtag,
+        second_hashtag: second_hashtag,
+        third_hashtag: third_hashtag,
       },
       { returning: ['post_id'] },
     );
@@ -159,14 +194,25 @@ export const createPost = async (
   // author will be req.user.id once auth is done
 };
 
-export const deletePost = async (postID: string): Promise<string> => {
-  const post = await Post.findOne({
-    where: {
-      postID: postID,
-    },
-  });
-  const results = await post.destroy();
-  // const query = "DELETE FROM posts where postID=" + postID;
+export const deletePost = async (
+  postID: string,
+  curUser: string,
+): Promise<string> => {
+  let results;
+  try {
+    const post = await Post.findOne({
+      where: {
+        postID: postID,
+        author: curUser,
+      },
+    });
+    if (!post) {
+      throw new AppError('Post to delete is not found', 404);
+    }
+    results = await post.destroy();
+  } catch (error) {
+    throw new AppError('Post being deleted doesnt exist', 500);
+  } // const query = "DELETE FROM posts where postID=" + postID;
   // const results = await sequelize.query(query);
   // console.log(results);
   return JSON.stringify(results);
@@ -179,17 +225,17 @@ export const modifyPost = async (
   content: string,
   imageURL?: string,
 ): Promise<string> => {
+  let postToModify;
   try {
-    let post;
     if (imageURL === '') {
-      post = await Post.update(
+      postToModify = await Post.update(
         { title: title, content: content },
         { where: { _id: postID } },
       ).then(function (result) {
         console.log(result);
       });
     } else {
-      post = await Post.update(
+      postToModify = await Post.update(
         { title: title, content: content, imageURL: imageURL },
         { where: { _id: postID } },
       ).then(function (result) {
@@ -198,15 +244,18 @@ export const modifyPost = async (
     }
   } catch (error) {
     console.log('error updating post: ' + postID + ', ' + error);
+    throw new AppError('unable to update post', 500, error);
   }
-  const res = JSON.stringify(post);
+  const res = JSON.stringify(postToModify);
   return res;
 };
 
 export default {
+  Post,
   getAllPosts,
   getAnIndividualPost,
   SearchAllPostsbyTitle,
+  SearchAllPostsbyHashtag,
   getPostsByAnIndividual,
   createPost,
   modifyPost,

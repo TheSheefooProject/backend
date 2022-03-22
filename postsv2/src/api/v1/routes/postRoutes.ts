@@ -11,5 +11,9 @@ postsRouter
   .patch(postsController.modifyPost)
   .delete(postsController.deletePost);
 postsRouter.route('/:titlesearch').get(postsController.searchPostByTitle);
+postsRouter
+  .route('/:hashtagsearch')
+  .get(postsController.SearchAllPostsbyHashtag);
+postsRouter.route('/:userID').get(postsController.getPostsByAnIndividual);
 
 export default postsRouter;

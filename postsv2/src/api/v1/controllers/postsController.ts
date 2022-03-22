@@ -69,12 +69,18 @@ export const createPost = async (
       content: contentRaw,
       imageURL: imageURLRaw,
     } = validatePostFields(req.body);
+    const first_hashtag = req.body.first_hashtag ? req.body.first_hashtag : '';
+    const second_hashtag = req.body.first_hashtag ? req.body.first_hashtag : '';
+    const third_hashtag = req.body.first_hashtag ? req.body.first_hashtag : '';
     const user = String(req.user);
     const postID = await posts.createPost(
       user,
       titleRaw,
       contentRaw,
       imageURLRaw,
+      first_hashtag,
+      second_hashtag,
+      third_hashtag,
     );
     res.status(200).json({
       status: 'success',
@@ -94,6 +100,7 @@ export const getAnIndividualPost = async (
   const postID = req.params.post_id;
   try {
     post = await posts.getAnIndividualPost(postID);
+    res.status(200).json({ status: 'success', post: post });
   } catch (error) {
     next(error);
   }
@@ -105,9 +112,32 @@ export const searchPostByTitle = async (
   next: NextFunction,
 ): Promise<void> => {
   let post;
-  const postID = req.params.post_id;
+  const title = req.params.title;
   try {
-    post = await posts.getAnIndividualPost(postID);
+    post = await posts.SearchAllPostsbyTitle(title);
+    res.status(200).json({ status: 'success', post: post });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const SearchAllPostsbyHashtag = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  let postResults;
+  const searchHashtag = req.params.hashtag;
+  if (searchHashtag === '') {
+    throw new AppError('Please provide a hashtag to search for', 500);
+  }
+  if (searchHashtag.length > 50) {
+    throw new AppError('Please enter a hashtag less than 50 characters', 500);
+  }
+
+  try {
+    postResults = await posts.SearchAllPostsbyHashtag(searchHashtag);
+    res.status(200).json({ status: 'success', postResults: postResults });
   } catch (error) {
     next(error);
   }
@@ -118,10 +148,13 @@ export const getPostsByAnIndividual = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  let post;
+  let postsByIndividual;
   const userID = req.body.userID;
   try {
-    post = await posts.getPostsByAnIndividual(userID);
+    postsByIndividual = await posts.getPostsByAnIndividual(userID);
+    res
+      .status(200)
+      .json({ status: 'success', postsByIndividual: postsByIndividual });
   } catch (error) {
     next(error);
   }
@@ -149,11 +182,24 @@ export const modifyPost = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  let allPosts;
+  let Posts;
+  const {
+    author: authorRaw,
+    title: TitleRaw,
+    content: ContentRaw,
+    imageURL: imageURLRaw,
+  } = validatePostFields(req.body);
+  const postID = req.body.postID;
   try {
-    allPosts = await posts.getAllPosts();
+    Posts = await posts.modifyPost(
+      postID,
+      authorRaw,
+      TitleRaw,
+      ContentRaw,
+      imageURLRaw,
+    );
     res.status(200).json({
-      allPosts: allPosts,
+      Posts: Posts,
       status: 'success',
     });
   } catch (error) {
@@ -168,10 +214,11 @@ export const deletePost = async (
   next: NextFunction,
 ): Promise<void> => {
   const postID = req.body.post_id;
+  const user = String(req.user);
   try {
-    const allPosts = await posts.deletePost(postID);
+    const delPost = await posts.deletePost(postID, user);
     res.status(200).json({
-      allPosts: allPosts,
+      delPost: delPost,
       status: 'success',
     });
   } catch (error) {
@@ -186,6 +233,7 @@ export default {
   getPostsByAnIndividual,
   createPost,
   searchPostByTitle,
+  SearchAllPostsbyHashtag,
   modifyPost,
   deletePost,
 };
