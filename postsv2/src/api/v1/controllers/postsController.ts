@@ -98,6 +98,9 @@ export const getAnIndividualPost = async (
 ): Promise<void> => {
   let post;
   const postID = req.params.post_id;
+  if (!postID) {
+    throw new AppError('please provide a post id', 400);
+  }
   try {
     post = await posts.getAnIndividualPost(postID);
     res.status(200).json({ status: 'success', post: post });
@@ -113,6 +116,9 @@ export const searchPostByTitle = async (
 ): Promise<void> => {
   let post;
   const title = req.params.title;
+  if (!title) {
+    throw new AppError('please provide missing title criteria', 400);
+  }
   try {
     post = await posts.SearchAllPostsbyTitle(title);
     res.status(200).json({ status: 'success', post: post });
@@ -129,10 +135,10 @@ export const SearchAllPostsbyHashtag = async (
   let postResults;
   const searchHashtag = req.params.hashtag;
   if (searchHashtag === '') {
-    throw new AppError('Please provide a hashtag to search for', 500);
+    throw new AppError('Please provide a hashtag to search for', 400);
   }
   if (searchHashtag.length > 50) {
-    throw new AppError('Please enter a hashtag less than 50 characters', 500);
+    throw new AppError('Please enter a hashtag less than 50 characters', 422);
   }
 
   try {
@@ -150,6 +156,10 @@ export const getPostsByAnIndividual = async (
 ): Promise<void> => {
   let postsByIndividual;
   const userID = req.body.userID;
+  // TODO: check userid exists
+  if (!userID) {
+    throw new AppError('Invalid user id supplied', 400);
+  }
   try {
     postsByIndividual = await posts.getPostsByAnIndividual(userID);
     res
@@ -200,6 +210,7 @@ export const modifyPost = async (
     );
     res.status(200).json({
       Posts: Posts,
+      postID: postID,
       status: 'success',
     });
   } catch (error) {

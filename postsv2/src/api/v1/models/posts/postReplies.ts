@@ -100,17 +100,27 @@ async function createPostReply(
   // author will be req.user.id once auth is done
 }
 
-async function deletePostReply(postReplyID: string) {
+async function deletePostReply(postReplyID: string, author: string) {
   const post = await PostReply.findOne({
     where: {
       post_replies_id: postReplyID,
+      author: author,
     },
   });
+  if (!post) {
+    throw new AppError(
+      'Unable to find a post for the specified parameters',
+      500,
+    );
+  }
   const results = await post.destroy();
   return JSON.stringify(results);
 }
 
 async function modifyPostReply(postReplyID: string, content: string) {
+  if (!content) {
+    throw new AppError('Please provide new content for post', 422);
+  }
   const curtime = Date.now();
   let postReplyToModify;
   try {

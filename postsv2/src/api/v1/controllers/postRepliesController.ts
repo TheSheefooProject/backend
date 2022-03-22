@@ -85,6 +85,9 @@ export const getPostReplies = async (
   let postRepliesForId;
   try {
     const postId = req.params.post_id;
+    if (!postId) {
+      throw new AppError('Please provide post id to find replies ', 400);
+    }
     postRepliesForId = await postsReplies.getPostReplies(postId);
     res.status(200).json({ status: 'success', postReplies: postRepliesForId });
   } catch (error) {
@@ -101,6 +104,9 @@ export const modifyPostReply = async (
   const { postReplyID: postReplyIDRaw, content: contentRaw } = req.body;
   if (contentRaw.length < 1) {
     throw new AppError('Please provide body for the reply', 500);
+  }
+  if (!postReplyIDRaw) {
+    throw new AppError('Please provide post reply id to update ', 400);
   }
   try {
     postReplyToModify = await postsReplies.modifyPostReply(
@@ -122,7 +128,12 @@ export const getPostReplybyID = async (
 ): Promise<void> => {
   let postReply;
   try {
-    postReply = await postsReplies.getPostReplybyID(req.params.post_replies_id);
+    const postReplyIDRaw = req.params.post_replies_id;
+    if (!postReplyIDRaw) {
+      throw new AppError('Please provide post reply id to update ', 400);
+    }
+
+    postReply = await postsReplies.getPostReplybyID(postReplyIDRaw);
     res.status(200).json({ status: 'success', postReply: postReply });
   } catch (error) {
     next(error);
@@ -138,6 +149,7 @@ export const deletePostReply = async (
   try {
     postReplyToDelete = await postsReplies.deletePostReply(
       req.params.post_replies_id,
+      req.params.author,
     );
     res
       .status(200)
