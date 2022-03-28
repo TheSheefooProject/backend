@@ -92,6 +92,7 @@ export const getPostReplies = async (
     res.status(200).json({ status: 'success', postReplies: postRepliesForId });
   } catch (error) {
     next(error);
+    return;
   }
 };
 
