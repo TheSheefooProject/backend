@@ -226,7 +226,7 @@ export const forgotPasswordEmailGeneration = async (
     const randomGeneratedNumbers = generateForgotEmailRandomNumbers();
     await updateForgotEmailVerificationCodeDB(
       userData.id,
-      randomGeneratedNumbers.valuesString,
+      randomGeneratedNumbers,
     );
     await sendForgottenEmail(UserEmail, randomGeneratedNumbers);
     res.status(200).json({
@@ -250,16 +250,15 @@ export const verifyForgottenPassword = async (
       validateForgotPasswordValidator(req);
 
     const userData = await getUserData(email, 'EMAIL');
-    if (!userData.password_forgotten_string) {
+    if (!userData.reset_verification_code) {
       throw new AppError(
         'generate a password reset email. Before attempting reset.',
         403,
       );
     }
-    const forgotPassDBExtracted = extractValuesFromString(
-      userData.password_forgotten_string,
-    );
-    if (forgotPassDBExtracted.expired) {
+    const forgotPassDBExtracted = userData.reset_verification_code;
+    const expired = parseInt(forgotPassDBExtracted.expiryTime) < Date.now();
+    if (expired) {
       throw new AppError(
         'the password forgot values have expired. Generate a new verification email.',
         401,

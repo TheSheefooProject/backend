@@ -21,27 +21,17 @@ export const updateUserDetailsValidator = (req: Request) => {
   const {
     firstName: firstNameRaw,
     lastName: lastNameRaw,
-    number: numberRaw,
-    gender: genderRaw,
     username: usernameRaw,
     email: emailRaw,
     password: passwordRaw,
-    dob: dobRaw,
-    profilePicSeed,
-    publicProfile,
+    profilePicURL,
   } = req.body;
 
   const emailObject = emailRaw && validateEmail(emailRaw);
   const firstNameObject = firstNameRaw && validateName(firstNameRaw);
   const lastNameObject = lastNameRaw && validateName(lastNameRaw, 'LAST');
-  const numberObject = numberRaw && validatePhoneNumber(numberRaw);
   const usernameObject = usernameRaw && validateUsername(usernameRaw);
-  const dobObject = dobRaw && validateDOB(dobRaw);
-  const genderObject = genderRaw && validateGender(genderRaw, false);
   const passwordObject = passwordRaw && validatePassword(passwordRaw);
-  const profilePicSeedObject =
-    profilePicSeed && validateProfilePic(profilePicSeed);
-  const publicProfileToggle = publicProfile && Boolean(publicProfile);
 
   if (emailObject && !emailObject.valid) {
     error.push(emailObject.error);
@@ -58,15 +48,6 @@ export const updateUserDetailsValidator = (req: Request) => {
   if (passwordObject && !passwordObject.valid) {
     error.push(passwordObject.error);
   }
-  if (numberObject && !numberObject.valid) {
-    error.push(numberObject.error);
-  }
-  if (dobObject && !dobObject.valid) {
-    error.push(dobObject.error);
-  }
-  if (profilePicSeedObject && !profilePicSeedObject.valid) {
-    error.push(profilePicSeedObject.error);
-  }
 
   if (error.length > 0) {
     throw new AppError(
@@ -79,14 +60,10 @@ export const updateUserDetailsValidator = (req: Request) => {
   const DataToReturn = {
     firstName: firstNameObject && firstNameObject.value,
     lastName: lastNameObject && lastNameObject.value,
-    number: numberObject && numberObject.value,
-    gender: genderObject && genderObject.value,
     username: usernameObject && usernameObject.value,
     email: emailObject && emailObject.value,
     password: passwordObject && passwordObject.value,
-    dob: dobObject && dobObject.value,
-    profilePicSeed: profilePicSeedObject && profilePicSeedObject.value,
-    publicProfile: publicProfileToggle,
+    profilePicURL,
   };
   const areAllFieldsBlank = Object.values(DataToReturn).every(
     o => o === undefined,

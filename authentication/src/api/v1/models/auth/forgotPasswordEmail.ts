@@ -2,14 +2,15 @@ import SendGrid from '@sendgrid/mail';
 import { FORGOT_EMAIL_EXPIRY_TIME } from '../../../../config/email';
 import dbHelpers from '../../helpers/dbHelpers';
 import AppError from '../../interfaces/AppError';
+import User from '../../../../db/user';
 const MAX_RETRY_PASSWORD_ATTEMPTS = 5;
 interface RandomForgotNumbers {
-  value1: string;
-  value2: string;
-  value3: string;
-  value4: string;
-  value5: string;
-  value6: string;
+  value1: number;
+  value2: number;
+  value3: number;
+  value4: number;
+  value5: number;
+  value6: number;
   expiryTime: string;
   valuesString: string;
   currentAttempt: number;
@@ -17,12 +18,12 @@ interface RandomForgotNumbers {
 }
 export const generateForgotEmailRandomNumbers = (): RandomForgotNumbers => {
   const MAX_INTEGER = 9; // Means values from 0 to 9
-  const value1 = Math.round(Math.random() * MAX_INTEGER).toString();
-  const value2 = Math.round(Math.random() * MAX_INTEGER).toString();
-  const value3 = Math.round(Math.random() * MAX_INTEGER).toString();
-  const value4 = Math.round(Math.random() * MAX_INTEGER).toString();
-  const value5 = Math.round(Math.random() * MAX_INTEGER).toString();
-  const value6 = Math.round(Math.random() * MAX_INTEGER).toString();
+  const value1 = Math.round(Math.random() * MAX_INTEGER);
+  const value2 = Math.round(Math.random() * MAX_INTEGER);
+  const value3 = Math.round(Math.random() * MAX_INTEGER);
+  const value4 = Math.round(Math.random() * MAX_INTEGER);
+  const value5 = Math.round(Math.random() * MAX_INTEGER);
+  const value6 = Math.round(Math.random() * MAX_INTEGER);
   const expiryTime = Date.now() + FORGOT_EMAIL_EXPIRY_TIME * 60 * 1000; // Code expires in 5 mins
   const valuesString = `${expiryTime}:${value1},${value2},${value3},${value4},${value5},${value6}:${MAX_RETRY_PASSWORD_ATTEMPTS}`;
   return {
@@ -38,34 +39,13 @@ export const generateForgotEmailRandomNumbers = (): RandomForgotNumbers => {
   };
 };
 
-export const extractValuesFromString = (
-  valuesString: string,
-): RandomForgotNumbers => {
-  const expiryTime = valuesString.split(':')[0];
-  const expired = parseInt(expiryTime) < Date.now();
-  const arrayValues = valuesString.split(':')[1].split(',');
-  const currentAttempt = parseInt(valuesString.split(':')[2]);
-  return {
-    value1: arrayValues[0],
-    value2: arrayValues[1],
-    value3: arrayValues[2],
-    value4: arrayValues[3],
-    value5: arrayValues[4],
-    value6: arrayValues[5],
-    currentAttempt,
-    expiryTime: expiryTime.toString(),
-    expired,
-    valuesString,
-  };
-};
-
 export const checkIfValidationCodesMatch = (
-  value1: string,
-  value2: string,
-  value3: string,
-  value4: string,
-  value5: string,
-  value6: string,
+  value1: number,
+  value2: number,
+  value3: number,
+  value4: number,
+  value5: number,
+  value6: number,
   valuesToCheckAgainst: RandomForgotNumbers,
 ): boolean => {
   let valid = true;
@@ -92,11 +72,14 @@ export const checkIfValidationCodesMatch = (
 
 export const updateForgotEmailVerificationCodeDB = async (
   id: string,
-  verificationCodes: string,
+  verificationCodes: RandomForgotNumbers,
 ): Promise<void> => {
-  const UPDATE_QUERY = `UPDATE users SET password_forgotten_string='${verificationCodes}' WHERE id='${id}'`;
-  const updateQuery = await dbHelpers.updateQuery(UPDATE_QUERY);
-  if (updateQuery.status == dbHelpers.APIStatus.Failed) {
+  try {
+    await User.findOneAndUpdate(
+      { id },
+      { reset_verification_code: verificationCodes },
+    );
+  } catch (e) {
     throw new AppError('Internal server generating verification value');
   }
 };
