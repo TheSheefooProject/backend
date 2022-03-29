@@ -11,7 +11,6 @@ import AppError from '../interfaces/AppError';
 import {
   checkIfValidationCodesMatch,
   decreaseCurrentAttempt,
-  extractValuesFromString,
   generateForgotEmailRandomNumbers,
   sendForgottenEmail,
   sendPasswordChangedEmail,
@@ -27,7 +26,6 @@ import {
 import {
   sendVerificationEmail,
   updateVerifiedEmail,
-  validOrganizationEmail,
 } from '../models/auth/validateEmail';
 import { getUserData, getUserId } from '../models/user';
 import { validateForgotPasswordValidator } from '../validators/authValidator/forogtPasswordValidator';
