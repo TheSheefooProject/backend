@@ -1,8 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
-import { ACCESS_TOKEN_UPDATE_TIME } from '../../../config/jwt';
-import { getUserSessionData } from '../models/auth/user';
+import {
+  ACCESS_TOKEN_UPDATE_SECONDS,
+  ACCESS_TOKEN_UPDATE_TIME,
+} from '../../../config/jwt';
 // import { getSession } from '../db';
 import { signJWT, verifyJWT } from '../models/auth/jwt';
+import { getUserSessionData } from '../models/auth/user';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function deserializeUser(
@@ -50,10 +53,11 @@ async function deserializeUser(
   //* Note: In an ideal world, we would not pass the data back in the header
   //* but set the cookie, by doing say. This is because you no longer need to pass in values
   //* and the Access token is stored in a secure cookie, as a result of httpOnly:true.
-  // res.cookie("accessToken", accessToken, {
-  //     maxAge: 300000, // 5 minutes
-  //     httpOnly: true,
-  //   });
+  res.cookie('accessToken', accessToken, {
+    maxAge: ACCESS_TOKEN_UPDATE_SECONDS,
+    httpOnly: true,
+    secure: true,
+  });
   res.set('access_token', newAccessToken);
   req.user = verifyJWT(newAccessToken).payload;
 
