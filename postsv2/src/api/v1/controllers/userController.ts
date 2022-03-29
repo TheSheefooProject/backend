@@ -1,7 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import AppError from '../interfaces/AppError';
 import { generateSaltedAndHashedPassword } from '../models/auth/user';
-import { sendVerificationEmail } from '../models/auth/validateEmail';
+import {
+  sendVerificationEmail,
+  validOrganizationEmail,
+} from '../models/auth/validateEmail';
 import {
   deleteUserFromUserTable,
   getUserData,
@@ -45,8 +48,10 @@ export const getUserDetails = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const userData = await getUserData(req.user.id, 'ID', true);
-    res.status(200).json({ status: 'success', userData });
+    res.status(200).json({ status: 'success', message: req.user });
+    // const userData = await getUserData(req.user.id, 'ID', true);
+    // res.status(200).json({ status: 'success', userData });
+    return;
   } catch (e) {
     next(e);
     return;
@@ -63,8 +68,18 @@ export const updateUserDetails = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const { firstName, lastName, username, email, password, profilePicURL } =
-      updateUserDetailsValidator(req);
+    const {
+      firstName,
+      lastName,
+      number,
+      gender,
+      username,
+      email,
+      password,
+      dob,
+      profilePicSeed,
+      publicProfile,
+    } = updateUserDetailsValidator(req);
 
     if (username) {
       const isUsernameNotUnique = await getUserId(username, 'USERNAME');
@@ -80,7 +95,12 @@ export const updateUserDetails = async (
           403,
         );
       }
-      await sendVerificationEmail(email, req.headers.host, req.user.id);
+      await sendVerificationEmail(
+        email,
+        req.headers.host,
+        req.user.id,
+        validOrganizationEmail(email) ? 'BOTH' : 'PERSONAL',
+      );
     }
     let hashedPassword;
     if (password) {
@@ -88,6 +108,7 @@ export const updateUserDetails = async (
       // await updateUserDetailsInDB(req.user.id, undefined, hashedPassword);
     }
 
+    const invalidatePreviousOrgEmail = validOrganizationEmail(email);
     // The above is since if the user email is an org email you want to change orgs. To main email.
     await updateUserDetailsInDB(
       req.user.id,
@@ -96,7 +117,12 @@ export const updateUserDetails = async (
       username,
       firstName,
       lastName,
-      profilePicURL,
+      number,
+      gender,
+      dob,
+      profilePicSeed,
+      publicProfile,
+      invalidatePreviousOrgEmail,
     );
     res.status(200).json({
       status: 'success',
