@@ -5,4 +5,5 @@ Since we are using docker-compose, run the following command, to test if the cha
 
 Dev commands:
 Command to run mongodb server locally
+`docker system prune -a`
 `docker run -d --name authentication-db -v ~/mongo/data:/data/db -p 27017:27017 mongo:latest`

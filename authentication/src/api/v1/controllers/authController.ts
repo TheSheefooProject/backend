@@ -325,7 +325,7 @@ export const logoutUser = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    await invalidateUserSession(req.user.email);
+    await invalidateUserSession(req.body.email);
     res.status(200).json({
       status: 'success',
       message: 'user has been logged out',
