@@ -14,12 +14,12 @@ export const verifyUserAuthentication = async (
   try {
     const accessToken = _extractAccessToken(req);
     const refreshToken = _extractRefreshToken(req);
-
     if (!accessToken) {
       res.status(401).json({
         status: 'error',
         message: 'An access token has to be provided.',
       });
+      return;
     }
 
     const { payload, expired } = verifyJWT(accessToken);
@@ -28,8 +28,8 @@ export const verifyUserAuthentication = async (
         status: 'success',
         payload,
       });
+      return;
     }
-
     //expired but valid access token
     const { payload: refresh } =
       expired && refreshToken ? verifyJWT(refreshToken) : { payload: null };
@@ -39,15 +39,18 @@ export const verifyUserAuthentication = async (
         status: 'error',
         message: 'The access token has expired. A provide a refresh token.',
       });
+      return;
     }
 
     const userData = await getUserSessionData(refresh.id);
+
     if (!userData) {
       res.status(500).json({
         status: 'error',
         message:
           'User data could not be found from refresh token. Check account is not deleted or refresh token expired.',
       });
+      return;
     }
 
     const newAccessToken = signJWT(
@@ -65,7 +68,7 @@ export const verifyUserAuthentication = async (
       httpOnly: true,
       secure: true,
     });
-    res.set('access_token', newAccessToken);
+    // res.set('access_token', newAccessToken);
 
     const userPayloadData = verifyJWT(newAccessToken).payload;
     res.status(200).json({

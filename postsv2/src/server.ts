@@ -9,28 +9,13 @@ if (process.env.NODE_ENV === 'DEVELOPMENT') {
 }
 
 /**
- * Connect to the mongoose database, and if successful start express server
+ * Start Express server.
  */
-// mongoose
-//   .connect('mongodb://localhost:27017/authentication-db')
-//   .then(() => {
-//     console.log('Database connection made');
-
-//     /**
-//      * Start Express server.
-//      */
-//     app.listen(process.env.NODE_PORT || 3000, () => {
-//       console.log(
-//         'App is running at http://localhost:%d in %s mode',
-//         process.env.NODE_PORT,
-//         process.env.NODE_ENV,
-//       );
-//       console.log('Press CTRL-C to stop\n');
-//     });
-//   })
-//   .catch(e => {
-//     console.error(
-//       'Database connection failed, api has failed to start. Error:',
-//       e,
-//     );
-//   });
+app.listen(process.env.NODE_PORT || 3001, () => {
+  console.log(
+    'App is running at http://localhost:%d in %s mode',
+    process.env.NODE_PORT,
+    process.env.NODE_ENV,
+  );
+  console.log('Press CTRL-C to stop\n');
+});

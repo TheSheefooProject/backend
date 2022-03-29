@@ -48,8 +48,10 @@ export const getUserDetails = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const userData = await getUserData(req.user.id, 'ID', true);
-    res.status(200).json({ status: 'success', userData });
+    res.status(200).json({ status: 'success', message: req.user });
+    // const userData = await getUserData(req.user.id, 'ID', true);
+    // res.status(200).json({ status: 'success', userData });
+    return;
   } catch (e) {
     next(e);
     return;

@@ -1,10 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import AppError from '../interfaces/AppError';
 import { generateSaltedAndHashedPassword } from '../models/auth/user';
-import {
-  sendVerificationEmail,
-  validOrganizationEmail,
-} from '../models/auth/validateEmail';
+import { sendVerificationEmail } from '../models/auth/validateEmail';
 import {
   deleteUserFromUserTable,
   getUserData,

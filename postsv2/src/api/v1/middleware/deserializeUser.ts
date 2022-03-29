@@ -1,8 +1,5 @@
+import axios from 'axios';
 import { NextFunction, Request, Response } from 'express';
-import { ACCESS_TOKEN_UPDATE_TIME } from '../../../config/jwt';
-import { getUserSessionData } from '../models/auth/user';
-// import { getSession } from '../db';
-import { signJWT, verifyJWT } from '../models/auth/jwt';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function deserializeUser(
@@ -13,50 +10,26 @@ async function deserializeUser(
   const accessToken = _extractAccessToken(req);
   const refreshToken = _extractRefreshToken(req);
 
-  if (!accessToken) {
-    return next();
+  //Setting up the db connection
+  let connectionString = 'http://localhost:80/v1/internal/verify';
+  if (process.env.NODE_ENV === 'DEVELOPMENT') {
+    connectionString = 'http://localhost:3000/v1/internal/verify';
   }
-
-  const { payload, expired } = verifyJWT(accessToken);
-  // For a valid access token
-  if (payload) {
-    req.user = payload;
-    return next();
-  }
-
-  //expired but valid access token
-  const { payload: refresh } =
-    expired && refreshToken ? verifyJWT(refreshToken) : { payload: null };
-
-  if (!refresh) {
-    return next();
-  }
-
-  const userData = await getUserSessionData(refresh.id);
-  if (!userData) {
-    return next();
-  }
-
-  const newAccessToken = signJWT(
-    {
-      id: userData.id,
-      email: userData.email,
-      username: userData.username,
-      sessionId: userData.session_id,
+  const headers = {
+    headers: {
+      Authorization: 'Bearer ' + accessToken,
+      refresh_token: refreshToken,
     },
-    ACCESS_TOKEN_UPDATE_TIME,
-  );
-
-  //* Note: In an ideal world, we would not pass the data back in the header
-  //* but set the cookie, by doing say. This is because you no longer need to pass in values
-  //* and the Access token is stored in a secure cookie, as a result of httpOnly:true.
-  // res.cookie("accessToken", accessToken, {
-  //     maxAge: 300000, // 5 minutes
-  //     httpOnly: true,
-  //   });
-  res.set('access_token', newAccessToken);
-  req.user = verifyJWT(newAccessToken).payload;
-
+  };
+  try {
+    const userData = await axios.get(connectionString, headers);
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    req.user = userData.data.payload;
+  } catch (error) {
+    res.status(401).json(error.response.data);
+    return;
+  }
   return next();
 }
 
