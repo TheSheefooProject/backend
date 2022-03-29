@@ -31,7 +31,38 @@ const userSchema = new Schema(
       type: String,
     },
     reset_verification_code: {
-      type: Array,
+      value1: {
+        type: Number,
+      },
+      value2: {
+        type: Number,
+      },
+      value3: {
+        type: Number,
+      },
+      value4: {
+        type: Number,
+      },
+      value5: {
+        type: Number,
+      },
+      value6: {
+        type: Number,
+      },
+      expiryTime: {
+        type: String,
+      },
+      valuesString: {
+        type: String,
+      },
+      currentAttempt: {
+        type: Number,
+        default: 0,
+      },
+      expired: {
+        type: Boolean,
+        default: false,
+      },
     },
     session_id: {
       type: Number,

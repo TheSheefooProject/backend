@@ -63,10 +63,10 @@ export const createUserSession = async (email: string): Promise<number> => {
 
 //todo: Below should be called when a user calls all the forgot user stuff.
 export const invalidateUserSession = async (email: string): Promise<void> => {
-  // A value of 0 indicates false.
-  const UPDATE_QUERY = `UPDATE users SET session_valid=${0} WHERE email='${email}'`;
-  const updateQuery = await dbHelpers.updateQuery(UPDATE_QUERY);
-  if (updateQuery.status === dbHelpers.APIStatus.Failed) {
+  const userData = await getUserData(email);
+  try {
+    await User.findOneAndUpdate({ id: userData.id }, { session_valid: false });
+  } catch (e) {
     throw new AppError('Failed un-authorizing user.');
   }
 };
