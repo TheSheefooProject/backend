@@ -1,5 +1,6 @@
 import express from 'express';
 import postsController from '../controllers/postsController';
+import { requireAuthenticatedUser } from '../middleware/requireAuthenticatedUser';
 
 const postsRouter = express.Router();
 

@@ -176,11 +176,12 @@ export const getAllPosts = async (
 ): Promise<void> => {
   let allPosts;
   try {
-    allPosts = await posts.getAllPosts();
-    res.status(200).json({
-      allPosts: allPosts,
-      status: 'success',
-    });
+    res.status(200).json({ status: 'success' });
+    // allPosts = await posts.getAllPosts();
+    // res.status(200).json({
+    //   allPosts: allPosts,
+    //   status: 'success',
+    // });
   } catch (error) {
     next(error);
     return;
