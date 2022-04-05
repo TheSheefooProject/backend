@@ -34,6 +34,9 @@ const Post = sequelize.define('post', {
 });
 
 async function getAllPosts() {
+  console.log('\n\n\n\n\n');
+  console.log('dbConfigPosts', dbConfigPosts);
+  console.log('\n\n\n\n\n');
   const posts = Post.findAll({
     attributes: ['*'],
     order: [['time_created', 'DESC']],
