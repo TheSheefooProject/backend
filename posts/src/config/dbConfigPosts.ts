@@ -3,8 +3,8 @@ const dbConfigPosts = {
   USER: 'postgres',
   PASSWORD: 'password',
   DB: 'posts-db',
-  dialect: 'postgres',
-  port: 5432,
+  dialect: 'sqlite',
+  port: 27018,
   pool: {
     max: 5,
     min: 0,

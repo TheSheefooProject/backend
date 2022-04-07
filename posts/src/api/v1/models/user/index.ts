@@ -1,7 +1,7 @@
 import dbHelpers from '../../helpers/dbHelpers';
 import AppError from '../../interfaces/AppError';
 import { validOrganizationEmail } from '../auth/validateEmail';
-import userModel from '../../../../db/user';
+import userModel from '../../../../db/post';
 //* Generic function for get all data associated to a user
 type GET_QUERY_PARAMETER_TYPE = 'USERNAME' | 'EMAIL' | 'ID';
 export const getUserData = async (
