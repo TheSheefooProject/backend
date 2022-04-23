@@ -14,9 +14,9 @@ postsRouter
   .get(postsController.getAnIndividualPost)
   .patch(requireAuthenticatedUser, postsController.modifyPost)
   .delete(requireAuthenticatedUser, postsController.deletePost);
-postsRouter.route('/:titlesearch').get(postsController.searchPostByTitle);
+postsRouter.route('/:titleSearch').get(postsController.searchPostByTitle);
 postsRouter
-  .route('/:hashtagsearch')
+  .route('/hashtag/:search')
   .get(postsController.SearchAllPostsbyHashtag);
 postsRouter.route('/:userID').get(postsController.getPostsByAnIndividual);
 

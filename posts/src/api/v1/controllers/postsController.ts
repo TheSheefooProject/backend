@@ -116,8 +116,8 @@ export const searchPostByTitle = async (
   next: NextFunction,
 ): Promise<void> => {
   let post;
-  const title = req.params.title;
-  console.log('SEARCH BY TITLE');
+  const title = req.params.titleSearch;
+  console.log('SEARCH BY TITLE', req.params);
   if (!title) {
     throw new AppError('please provide missing title criteria', 400);
   }
@@ -136,6 +136,7 @@ export const SearchAllPostsbyHashtag = async (
 ): Promise<void> => {
   let postResults;
   const searchHashtag = req.params.hashtag;
+  console.log('HELLO');
   if (searchHashtag === '') {
     throw new AppError('Please provide a hashtag to search for', 400);
   }
@@ -225,7 +226,7 @@ export const modifyPost = async (
     const updatedimageURL = imageURL ? imageURL : '';
     Posts = await posts.modifyPost(postID, title, content, updatedimageURL);
     res.status(200).json({
-      Posts: Posts,
+      Posts: JSON.parse(Posts),
       postID: postID,
       status: 'success',
     });
@@ -240,12 +241,12 @@ export const deletePost = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  const postID = req.body.post_id;
-  const user = String(req.user);
+  const postID = req.params.post_id.substring(8);
+  const user = String(req.user.id);
   try {
     const delPost = await posts.deletePost(postID, user);
     res.status(200).json({
-      delPost: delPost,
+      delPost: JSON.stringify(delPost),
       status: 'success',
     });
   } catch (error) {

@@ -128,15 +128,9 @@ export const deletePost = async (
   let results;
   try {
     const query = { _id: postID };
-    const postExists = await postModel
-      .find({
-        $and: [{ _id: `/${postID}/` }, { author: `/${curUser}/` }],
-      })
-      .exec();
-    if (!postExists) {
-      throw new AppError('Post to delete is not found', 404);
-    }
-    results = await postModel.deleteOne(query);
+    console.log(postID, ', ', curUser);
+
+    results = await postModel.deleteOne({ _id: postID });
   } catch (error) {
     throw new AppError('Post being deleted doesnt exist', 500);
   } // const query = "DELETE FROM posts where postID=" + postID;
@@ -154,20 +148,12 @@ export const modifyPost = async (
   let modifications;
   let post;
   try {
-    console.log('try', title);
-
     if (imageURL === '') {
       modifications = {
         title: title,
         content: content,
         imageURL: imageURL,
       };
-      // postToModify = await postModel.updateOne(
-      //   { title: title, content: content },
-      //   { where: { _id: postID } },
-      // ).then(function (result) {
-      //   console.log(result);
-      // });
     } else {
       modifications = {
         title: title,
@@ -185,11 +171,6 @@ export const modifyPost = async (
         imageURL: imageURL,
       },
     );
-    // post = await postModel.findOneAndUpdate(
-    //   { _id: postID },
-    //   { $set: { modifications } },
-    //   { new: true },
-    // );
   } catch (error) {
     console.log('error updating post: ' + postID + ', ' + error);
     throw new AppError('unable to update post', 500, error);
