@@ -32,7 +32,7 @@ async function SearchAllPostsbyHashtag(hashtag: string) {
 }
 
 async function getAnIndividualPost(postID: string) {
-  const posts = await postModel.find({ id: `/${postID}/` });
+  const posts = await postModel.findById(postID);
 
   console.log(posts);
   return posts;
@@ -66,6 +66,9 @@ export const createPost = async (
         { author: `/${author}/` },
         { title: `/${title}/` },
         { content: `/${content}/` },
+        { first_hashtag: `/${first_hashtag}/` },
+        { second_hashtag: `/${second_hashtag}/` },
+        { third_hashtag: `/${third_hashtag}/` },
       ],
     })
     .exec();
@@ -73,16 +76,18 @@ export const createPost = async (
   if (postExists.length > 0) {
     throw new AppError('Post already exists', 500);
   }
+  console.log('HERE: ', first_hashtag);
   if (imageURL === '') {
+    // TODO: change to new post model as per jeesons thing in auth user
     newPost = await postModel.create(
       {
-        author: author,
-        title: title,
-        content: content,
-        time_created: curtime,
-        first_hashtag: first_hashtag,
-        second_hashtag: second_hashtag,
-        third_hashtag: third_hashtag,
+        author,
+        title,
+        content,
+        curtime,
+        first_hashtag,
+        second_hashtag,
+        third_hashtag,
       },
       { returning: ['_id'] },
     );
@@ -96,6 +101,8 @@ export const createPost = async (
     //   content +
     //   "', ' '";
   } else {
+    console.log('HERE2');
+
     newPost = await postModel.create(
       {
         author: author,
@@ -103,6 +110,7 @@ export const createPost = async (
         content: content,
         time_created: curtime,
         imageURL: imageURL,
+        first_hashtag: first_hashtag,
       },
       { returning: ['_id'] },
     );

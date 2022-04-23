@@ -64,22 +64,25 @@ export const createPost = async (
       content: contentRaw,
       imageURL: imageURLRaw,
     } = validatePostFields(req);
-    const first_hashtag = req.body.first_hashtag ? req.body.first_hashtag : '';
-    const second_hashtag = req.body.first_hashtag ? req.body.first_hashtag : '';
-    const third_hashtag = req.body.first_hashtag ? req.body.first_hashtag : '';
-    const user = String(req.user.id);
+    console.log('req.body', req.body);
+    const first_hashtag = req.body.first_hashtag || '';
+    const second_hashtag = req.body.second_hashtag || '';
+    const third_hashtag = req.body.third_hashtag || '';
+    // const second_hashtag = req.body._hashtag ? req.body.first_hashtag : '';
+    // const third_hashtag = req.body.first_hashtag ? req.body.first_hashtag : '';
+    const author = req.user.id;
     const postID = await posts.createPost(
-      user,
+      author,
       titleRaw,
       contentRaw,
-      imageURLRaw,
       first_hashtag,
       second_hashtag,
       third_hashtag,
+      imageURLRaw,
     );
     res.status(200).json({
       status: 'success',
-      postID: postID,
+      postID: JSON.parse(postID),
     });
   } catch (error) {
     next(error);
@@ -92,7 +95,10 @@ export const getAnIndividualPost = async (
   next: NextFunction,
 ): Promise<void> => {
   let post;
-  const postID = req.params.post_id;
+  let postID = req.params.post_id;
+  console.log('HERE INDIV');
+
+  postID = postID.substring(8); // Get rid of "post_id="  from request
   if (!postID) {
     throw new AppError('please provide a post id', 400);
   }
@@ -111,6 +117,7 @@ export const searchPostByTitle = async (
 ): Promise<void> => {
   let post;
   const title = req.params.title;
+  console.log('SEARCH BY TITLE');
   if (!title) {
     throw new AppError('please provide missing title criteria', 400);
   }
@@ -150,7 +157,11 @@ export const getPostsByAnIndividual = async (
   next: NextFunction,
 ): Promise<void> => {
   let postsByIndividual;
-  const userID = req.body.userID;
+  let userID = req.params.userID;
+  console.log('userID', userID);
+
+  userID = userID.substring(6);
+  console.log('userID', userID);
   // TODO: check userid exists
   if (!userID) {
     throw new AppError('Invalid user id supplied', 400);
@@ -189,14 +200,29 @@ export const modifyPost = async (
   next: NextFunction,
 ): Promise<void> => {
   let Posts;
-  const {
-    title: TitleRaw,
-    content: ContentRaw,
-    imageURL: imageURLRaw,
-  } = validatePostFields(req.body);
+  console.log(req.body);
+
+  const { title: title, content: content, imageURL: imageURL } = req.body;
+
   const postID = req.body.postID;
   try {
-    Posts = await posts.modifyPost(postID, TitleRaw, ContentRaw, imageURLRaw);
+    const errors = [];
+    const titleErr = validateTitle(title, 'Title');
+    const contentErr = validateTitle(content, 'Content');
+    if (!titleErr.valid) {
+      errors.push(titleErr.error);
+    }
+    if (!contentErr.valid) {
+      errors.push(contentErr.error);
+    }
+    if (errors.length > 0) {
+      throw new AppError(
+        `There were some errors trying to create your post. There were ${errors.length} errors`,
+        401,
+        { validationErrors: errors },
+      );
+    }
+    Posts = await posts.modifyPost(postID, title, content, imageURL);
     res.status(200).json({
       Posts: Posts,
       postID: postID,
