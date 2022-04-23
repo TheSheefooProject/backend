@@ -147,7 +147,6 @@ export const deletePost = async (
 
 export const modifyPost = async (
   postID: string,
-  author: string,
   title: string,
   content: string,
   imageURL?: string,
@@ -155,8 +154,14 @@ export const modifyPost = async (
   let modifications;
   let post;
   try {
+    console.log('try', title);
+
     if (imageURL === '') {
-      modifications = { author: author, title: title, content: content };
+      modifications = {
+        title: title,
+        content: content,
+        imageURL: imageURL,
+      };
       // postToModify = await postModel.updateOne(
       //   { title: title, content: content },
       //   { where: { _id: postID } },
@@ -165,17 +170,32 @@ export const modifyPost = async (
       // });
     } else {
       modifications = {
-        author: author,
         title: title,
         content: content,
         imageURL: imageURL,
       };
     }
-    post = await postModel.findByIdAndUpdate(postID, modifications);
+    console.log(`Modifications to ${postID}: `, modifications);
+
+    post = await postModel.findOneAndUpdate(
+      { id: postID },
+      {
+        title: title,
+        content: content,
+        imageURL: imageURL,
+      },
+    );
+    // post = await postModel.findOneAndUpdate(
+    //   { _id: postID },
+    //   { $set: { modifications } },
+    //   { new: true },
+    // );
   } catch (error) {
     console.log('error updating post: ' + postID + ', ' + error);
     throw new AppError('unable to update post', 500, error);
   }
+  console.log(post.modifiedCount);
+
   const res = JSON.stringify(post);
   return res;
 };

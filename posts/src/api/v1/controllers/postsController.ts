@@ -200,11 +200,11 @@ export const modifyPost = async (
   next: NextFunction,
 ): Promise<void> => {
   let Posts;
-  console.log(req.body);
+  console.log('modify', req.body, req.params.post_id);
 
   const { title: title, content: content, imageURL: imageURL } = req.body;
 
-  const postID = req.body.postID;
+  const postID = req.params.post_id.substring(8);
   try {
     const errors = [];
     const titleErr = validateTitle(title, 'Title');
@@ -222,7 +222,8 @@ export const modifyPost = async (
         { validationErrors: errors },
       );
     }
-    Posts = await posts.modifyPost(postID, title, content, imageURL);
+    const updatedimageURL = imageURL ? imageURL : '';
+    Posts = await posts.modifyPost(postID, title, content, updatedimageURL);
     res.status(200).json({
       Posts: Posts,
       postID: postID,
