@@ -27,16 +27,12 @@ export const validateTitle = (
 };
 
 export const validatePostFields = (req: Request) => {
-  const {
-    author: authorRaw,
-    title: titleRaw,
-    content: contentRaw,
-    imageURL: imageURLRaw,
-  } = req.body;
+  console.log(req.body);
+  const { title, content, imageURL } = req.body;
 
   const errors = [];
-  const titleErr = validateTitle(titleRaw, 'Title');
-  const contentErr = validateTitle(contentRaw, 'Content');
+  const titleErr = validateTitle(title, 'Title');
+  const contentErr = validateTitle(content, 'Content');
   if (!titleErr.valid) {
     errors.push(titleErr.error);
   }
@@ -51,10 +47,9 @@ export const validatePostFields = (req: Request) => {
     );
   }
   return {
-    author: authorRaw,
-    title: titleRaw,
-    content: contentRaw,
-    imageURL: imageURLRaw,
+    title: title,
+    content: content,
+    imageURL: imageURL,
   };
 };
 
@@ -68,11 +63,11 @@ export const createPost = async (
       title: titleRaw,
       content: contentRaw,
       imageURL: imageURLRaw,
-    } = validatePostFields(req.body);
+    } = validatePostFields(req);
     const first_hashtag = req.body.first_hashtag ? req.body.first_hashtag : '';
     const second_hashtag = req.body.first_hashtag ? req.body.first_hashtag : '';
     const third_hashtag = req.body.first_hashtag ? req.body.first_hashtag : '';
-    const user = String(req.user);
+    const user = String(req.user.id);
     const postID = await posts.createPost(
       user,
       titleRaw,
@@ -195,20 +190,13 @@ export const modifyPost = async (
 ): Promise<void> => {
   let Posts;
   const {
-    author: authorRaw,
     title: TitleRaw,
     content: ContentRaw,
     imageURL: imageURLRaw,
   } = validatePostFields(req.body);
   const postID = req.body.postID;
   try {
-    Posts = await posts.modifyPost(
-      postID,
-      authorRaw,
-      TitleRaw,
-      ContentRaw,
-      imageURLRaw,
-    );
+    Posts = await posts.modifyPost(postID, TitleRaw, ContentRaw, imageURLRaw);
     res.status(200).json({
       Posts: Posts,
       postID: postID,

@@ -66,12 +66,11 @@ export const createPost = async (
         { author: `/${author}/` },
         { title: `/${title}/` },
         { content: `/${content}/` },
-        { time_created: `/${curtime}/` },
       ],
     })
     .exec();
-
-  if (postExists) {
+  console.log(postExists);
+  if (postExists.length > 0) {
     throw new AppError('Post already exists', 500);
   }
   if (imageURL === '') {
