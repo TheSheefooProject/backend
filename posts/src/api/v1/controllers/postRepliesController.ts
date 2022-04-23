@@ -27,12 +27,10 @@ export const validateTitle = (
   return { valid: !Boolean(error), error, value: titleRaw };
 };
 
-export const validatePostRepliesFields = (req: Request) => {
-  const {
-    author: authorRaw,
-    content: contentRaw,
-    postId: postIdRaw,
-  } = req.body;
+export const validatePostRepliesFields = (
+  contentRaw: string,
+  postIdRaw: string,
+) => {
   if (!posts.getAnIndividualPost(postIdRaw)) {
     throw new AppError('unable to find the post', 404);
   }
@@ -49,7 +47,6 @@ export const validatePostRepliesFields = (req: Request) => {
     );
   }
   return {
-    author: authorRaw,
     content: contentRaw,
     postId: postIdRaw,
   };
@@ -61,15 +58,15 @@ export const createPostReply = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const {
-      author: authorRaw,
-      content: contentRaw,
-      postId: PostIdRaw,
-    } = validatePostRepliesFields(req.body);
+    const content = req.body.content;
+    const postID = req.params.post_id;
+    const { content: contentRaw, postId: PostIdRaw } =
+      validatePostRepliesFields(content, postID);
+
     const postReplyId = await postsReplies.createPostReply(
-      authorRaw,
+      req.user.id,
       contentRaw,
-      PostIdRaw,
+      String(PostIdRaw.substring(8)),
     );
     res.status(200).json({ status: 'success', postReplyId: postReplyId });
   } catch (error) {

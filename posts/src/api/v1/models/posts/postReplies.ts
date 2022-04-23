@@ -1,11 +1,8 @@
 // library for postgres 0.0.0.0:5432
-// import dbConfigPosts from '../../../../config/dbConfigPosts';
-// import { Sequelize, STRING, DATE, INTEGER, Op } from 'sequelize';
 import AppError from '../../interfaces/AppError';
-
-// import { NextFunction, Request, Response } from "express";
 import postReplyModel from '../../../../db/postReplies';
 import posts from './posts';
+import mongoose from 'mongoose';
 
 async function getPostReplies(postID: string) {
   const postReplies = await postReplyModel
@@ -19,9 +16,7 @@ async function getPostReplies(postID: string) {
 }
 
 async function getPostReplybyID(postReplyID: string) {
-  const postReplies = postReplyModel.find({
-    post_replies_id: postReplyID,
-  });
+  const postReplies = postReplyModel.findById(postReplyID);
   if (!postReplies) {
     throw new AppError(`unable to find post reply for id ${postReplyID}`, 500);
   }
@@ -36,32 +31,52 @@ async function createPostReply(
   postID: string,
 ) {
   const curtime = Date.now();
-  const postExists = posts.getAnIndividualPost(postID);
-  if (!postExists) {
-    throw new AppError("Can't reply to a non-existing post", 500);
-  }
-
-  const postReplyExists = await postReplyModel.find({
+  const newPostReply = new postReplyModel({
     author: author,
     reply_content: content,
     timestamp: curtime,
+    post_id: postID,
   });
-  if (postReplyExists) {
-    throw new AppError('Post Reply already exists', 500);
+
+  try {
+    newPostReply.save();
+  } catch (error) {
+    throw new AppError(error, 500);
   }
-  const newPostReply = await postReplyModel.create(
-    {
-      author: author,
-      reply_content: content,
-      timestamp: curtime,
-    },
-    { returning: ['post_replies_id'] },
-  );
+} // const postExists = await posts.getAnIndividualPost(postID);
+// console.log('postExists', postExists);
 
-  return JSON.stringify(newPostReply);
+// if (!postExists) {
+//   throw new AppError("Can't reply to a non-existing post", 500);
+// }
+// console.log('MADE IT HERE', postID, postExists);
 
-  // author will be req.user.id once auth is done
-}
+// const postReplyExists = await postReplyModel.find({
+//   $and: [
+//     { author: author },
+//     { reply_content: content },
+//     { timestamp: curtime },
+//   ],
+// });
+
+//   console.log('MADE IT HERE', String(new mongoose.Types.ObjectId(postID)));
+//   // if (postReplyExists) {
+//   //   throw new AppError('Post Reply already exists', 500);
+//   // }
+//   const newPostReply = await postReplyModel.create(
+//     {
+//       author: author,
+//       reply_content: content,
+//       timestamp: curtime,
+//       // post_id: postID,
+//     },
+//     { returning: ['post_replies_id'] },
+//   );
+
+//   return JSON.stringify(newPostReply);
+
+//   // author will be req.user.id once auth is done
+// }
 
 async function deletePostReply(postReplyID: string, author: string) {
   const query = {
