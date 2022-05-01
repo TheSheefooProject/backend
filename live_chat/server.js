@@ -43,11 +43,10 @@ io.on('connect', (socket) => {
   socket.on('sendMessage', (message, callback) => {
     const user = getUser(socket.id);
     io.to(user.room).emit('message', {
-      user: user.user_id,
-      name: user.name,
-      text: message,
+      id: user.user_id,
+      userName: user.name,
+      message,
     });
-
     callback();
   });
 
