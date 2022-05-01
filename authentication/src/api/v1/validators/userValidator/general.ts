@@ -56,7 +56,7 @@ export const validateName = (
   }
   let error: string;
   //Ensure alphanumeric
-  const letterNumber = /^[0-9a-zA-Z]+$/;
+  const letterNumber = /^[0-9a-zA-Z ]+$/;
   const validName = name.match(letterNumber);
   if (!validName) {
     error = `${type.toLowerCase()} name must only be alphanumeric`;

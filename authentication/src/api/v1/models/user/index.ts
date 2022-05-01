@@ -53,6 +53,7 @@ export const updateUserDetailsInDB = async (
   newUsername?: string,
   newFullName?: string,
   newProfilePicURL?: string,
+  newUserBio?: string,
 ): Promise<void> => {
   const updateObject: any = {};
   if (newEmail) {
@@ -70,6 +71,10 @@ export const updateUserDetailsInDB = async (
   if (newProfilePicURL) {
     updateObject['profile_pic_url'] = newProfilePicURL;
   }
+  if (newUserBio) {
+    updateObject['user_bio'] = newUserBio;
+  }
+
   try {
     await User.findOneAndUpdate({ id }, updateObject);
   } catch (e) {

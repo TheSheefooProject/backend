@@ -46,6 +46,10 @@ export const getUserDetails = async (
 ): Promise<void> => {
   try {
     const userData = await getUserData(req.user.id, 'ID', true);
+
+    if (!userData) {
+      throw new AppError('User account has probably been deleted', 400);
+    }
     res.status(200).json({ status: 'success', userData });
   } catch (e) {
     next(e);
@@ -63,7 +67,7 @@ export const updateUserDetails = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const { firstName, lastName, username, email, password, profilePicURL } =
+    const { full_name, username, email, password, profilePicURL, user_bio } =
       updateUserDetailsValidator(req);
 
     if (username) {
@@ -94,9 +98,9 @@ export const updateUserDetails = async (
       email,
       hashedPassword,
       username,
-      firstName,
-      lastName,
+      full_name,
       profilePicURL,
+      user_bio,
     );
     res.status(200).json({
       status: 'success',
@@ -119,6 +123,10 @@ export const deleteUser = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
+    const userDetails = await getUserData(req.user.id, 'ID', true);
+    if (!userDetails) {
+      throw new AppError('User has already been deleted', 500);
+    }
     await deleteUserFromUserTable(req.user.id);
     //TODO Add remaining user delete actions
     res.status(200).json({
