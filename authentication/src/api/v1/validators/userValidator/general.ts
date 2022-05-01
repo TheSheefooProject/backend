@@ -1,5 +1,5 @@
 // Name validators
-const NAME_MAX_LENGTH = 30;
+const NAME_MAX_LENGTH = 60;
 const NAME_MIN_LENGTH = 1;
 // Username validators
 const USERNAME_MAX_LENGTH = 20;

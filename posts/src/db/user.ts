@@ -19,11 +19,7 @@ const userSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    first_name: {
-      type: String,
-      required: true,
-    },
-    last_name: {
+    full_name: {
       type: String,
       required: true,
     },
