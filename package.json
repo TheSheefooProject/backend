@@ -18,5 +18,8 @@
   "homepage": "https://github.com/TheSheefooProject/backend#readme",
   "devDependencies": {
     "husky": "^7.0.4"
+  },
+  "dependencies": {
+    "cors": "^2.8.5"
   }
 }
