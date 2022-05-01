@@ -46,7 +46,7 @@ export const validateRegistrationFields = (req: Request) => {
     );
   }
   return {
-    full_name: fullNameObject,
+    full_name: fullNameRaw,
     username: usernameRaw,
     email: emailRaw,
     password: passwordRaw,
