@@ -14,27 +14,22 @@ import {
 export const validateRegistrationFields = (req: Request) => {
   const error = [];
   const {
-    firstName: firstNameRaw,
-    lastName: lastNameRaw,
+    full_name: fullNameRaw,
     username: usernameRaw,
     email: emailRaw,
     password: passwordRaw,
   } = req.body;
 
   const emailObject = validateEmail(emailRaw);
-  const firstNameObject = validateName(firstNameRaw);
-  const lastNameObject = validateName(lastNameRaw, 'LAST');
+  const fullNameObject = validateName(fullNameRaw);
   const usernameObject = validateUsername(usernameRaw);
   const passwordObject = validatePassword(passwordRaw);
 
   if (!emailObject.valid) {
     error.push(emailObject.error);
   }
-  if (!firstNameObject.valid) {
-    error.push(firstNameObject.error);
-  }
-  if (!lastNameObject.valid) {
-    error.push(lastNameObject.error);
+  if (!fullNameObject.valid) {
+    error.push(fullNameObject.error);
   }
   if (!usernameObject.valid) {
     error.push(usernameObject.error);
@@ -51,8 +46,7 @@ export const validateRegistrationFields = (req: Request) => {
     );
   }
   return {
-    firstName: firstNameRaw,
-    lastName: lastNameRaw,
+    full_name: fullNameRaw,
     username: usernameRaw,
     email: emailRaw,
     password: passwordRaw,

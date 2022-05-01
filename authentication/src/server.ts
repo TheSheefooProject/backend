@@ -1,5 +1,4 @@
 import morgan from 'morgan';
-import config from './config/dbConfig';
 import app from './app';
 import mongoose from 'mongoose';
 

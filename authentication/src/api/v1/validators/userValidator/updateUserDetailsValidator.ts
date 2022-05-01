@@ -19,17 +19,16 @@ interface validationStatus {
 export const updateUserDetailsValidator = (req: Request) => {
   const error = [];
   const {
-    firstName: firstNameRaw,
-    lastName: lastNameRaw,
+    full_name: fullNamRaw,
     username: usernameRaw,
     email: emailRaw,
     password: passwordRaw,
     profilePicURL,
+    user_bio: userBioRaw,
   } = req.body;
 
   const emailObject = emailRaw && validateEmail(emailRaw);
-  const firstNameObject = firstNameRaw && validateName(firstNameRaw);
-  const lastNameObject = lastNameRaw && validateName(lastNameRaw, 'LAST');
+  const firstNameObject = fullNamRaw && validateName(fullNamRaw);
   const usernameObject = usernameRaw && validateUsername(usernameRaw);
   const passwordObject = passwordRaw && validatePassword(passwordRaw);
 
@@ -39,14 +38,15 @@ export const updateUserDetailsValidator = (req: Request) => {
   if (firstNameObject && !firstNameObject.valid) {
     error.push(firstNameObject.error);
   }
-  if (lastNameObject && !lastNameObject.valid) {
-    error.push(lastNameObject.error);
-  }
   if (usernameObject && !usernameObject.valid) {
     error.push(usernameObject.error);
   }
   if (passwordObject && !passwordObject.valid) {
     error.push(passwordObject.error);
+  }
+  //Hackily done to have it done quickly
+  if (userBioRaw && userBioRaw.length > 200) {
+    error.push('Bio cannot be more than 200 characters');
   }
 
   if (error.length > 0) {
@@ -58,12 +58,12 @@ export const updateUserDetailsValidator = (req: Request) => {
   }
 
   const DataToReturn = {
-    firstName: firstNameObject && firstNameObject.value,
-    lastName: lastNameObject && lastNameObject.value,
+    full_name: fullNamRaw && firstNameObject.value,
     username: usernameObject && usernameObject.value,
     email: emailObject && emailObject.value,
     password: passwordObject && passwordObject.value,
     profilePicURL,
+    user_bio: userBioRaw,
   };
   const areAllFieldsBlank = Object.values(DataToReturn).every(
     o => o === undefined,

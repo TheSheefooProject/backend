@@ -1,5 +1,5 @@
 // Name validators
-const NAME_MAX_LENGTH = 30;
+const NAME_MAX_LENGTH = 60;
 const NAME_MIN_LENGTH = 1;
 // Username validators
 const USERNAME_MAX_LENGTH = 20;
@@ -56,7 +56,7 @@ export const validateName = (
   }
   let error: string;
   //Ensure alphanumeric
-  const letterNumber = /^[0-9a-zA-Z]+$/;
+  const letterNumber = /^[0-9a-zA-Z ]+$/;
   const validName = name.match(letterNumber);
   if (!validName) {
     error = `${type.toLowerCase()} name must only be alphanumeric`;

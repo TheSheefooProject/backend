@@ -42,7 +42,7 @@ export const register = async (
 ): Promise<void> => {
   try {
     // Below function also throws error if needed
-    const { firstName, lastName, username, email, password } =
+    const { full_name, username, email, password } =
       validateRegistrationFields(req);
 
     const isUsernameNotUnique = await getUserId(username, 'USERNAME');
@@ -55,13 +55,7 @@ export const register = async (
       throw new AppError('Email is already registered to another account', 403);
     }
 
-    const userData = await createUser(
-      firstName,
-      lastName,
-      username,
-      email,
-      password,
-    );
+    const userData = await createUser(full_name, username, email, password);
     if (!userData) {
       throw new AppError(
         'Failed creating account. Ensure all provided fields are valid.',
@@ -75,8 +69,7 @@ export const register = async (
     res.status(200).json({
       status: 'success',
       user: {
-        firstName,
-        lastName,
+        full_name,
         username,
         email,
       },
