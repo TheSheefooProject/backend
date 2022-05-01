@@ -3,6 +3,8 @@ import mongoose from 'mongoose';
 import { createServer } from 'http';
 import dotenv from 'dotenv';
 import { Server } from 'socket.io';
+import apiV1Router from './routes/index.js';
+import cors from 'cors';
 import {
   getUser,
   getUsersInRoom,
@@ -13,12 +15,17 @@ import path from 'path';
 dotenv.config();
 
 const app = express();
+
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
     origin: '*',
   },
 });
+
+app.use(express.json());
+app.use(cors());
+app.use('/v1', apiV1Router);
 
 // Static code for testing
 app.use(express.static(path.join('./', 'public')));
