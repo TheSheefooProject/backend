@@ -7,7 +7,7 @@ Dev commands:
 Command to run mongodb server locally
 
 Run mongo db
-`docker run -d --name authentication-db -v ~/mongo/data:/data/db -p 27017:27017 mongo:latest`
+`docker run -d --name authentication-db -v ~/mongo/data/authentication:/data/db -p 27017:27017 mongo:latest`
 
 The below command should be run only if the above command did not work. After running the below command you can then run the above one. 
 `docker system prune -a`
@@ -15,4 +15,4 @@ The below command should be run only if the above command did not work. After ru
 Run redis instance
 
 ### Live server stuff
-`docker run -d --name live-chat-db2 -v ~/mongo/data:/data/db -p 27020:27017 mongo:latest`
+`docker run -d --name live-chat-db -v ~/mongo/data/live-chat:/data/db -p 27020:27017 mongo:latest`
