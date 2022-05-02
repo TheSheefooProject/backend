@@ -70,7 +70,7 @@ io.on('connect', (socket) => {
 });
 // Below code actually startup the server
 mongoose
-  .connect('mongodb://localhost:27017/authentication-db')
+  .connect('mongodb://localhost:27020/live-chat-db')
   .then(() => {
     console.log('Database connection made');
     server.listen(process.env.NODE_PORT || 3005, () => {

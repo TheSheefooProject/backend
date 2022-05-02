@@ -17,7 +17,7 @@ export const getUserData = async (
     } else if (type === 'USERNAME') {
       userData = await userModel.findOne({ username: identifier }).exec();
     } else {
-      userData = await userModel.findOne({ id: identifier }).exec();
+      userData = await userModel.findOne({ _id: identifier }).exec();
     }
     return userData;
   } catch (e) {

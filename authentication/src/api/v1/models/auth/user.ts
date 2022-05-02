@@ -50,7 +50,7 @@ export const createUserSession = async (email: string): Promise<number> => {
   // 1 represents valid, since schema has boolean for that field
   try {
     await User.findOneAndUpdate(
-      { id: userData.id },
+      { _id: userData.id },
       { session_id: newSessionID, session_valid: true },
     );
   } catch (e) {
@@ -63,7 +63,7 @@ export const createUserSession = async (email: string): Promise<number> => {
 export const invalidateUserSession = async (email: string): Promise<void> => {
   const userData = await getUserData(email);
   try {
-    await User.findOneAndUpdate({ id: userData.id }, { session_valid: false });
+    await User.findOneAndUpdate({ _id: userData.id }, { session_valid: false });
   } catch (e) {
     throw new AppError('Failed un-authorizing user.');
   }
