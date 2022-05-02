@@ -9,7 +9,7 @@ async function getAllPosts() {
 
 async function SearchAllPostsbyTitle(titleQuery: string) {
   const posts = await postModel
-    .find({ title: `/${titleQuery}/` })
+    .find({ title: { $regex: '.*' + titleQuery + '.*' } })
     .sort('-date')
     .exec();
   console.log(posts);
@@ -20,9 +20,9 @@ async function SearchAllPostsbyHashtag(hashtag: string) {
   const posts = await postModel
     .find({
       $or: [
-        { first_hashtag: `/${hashtag}/` },
-        { second_hashtag: `/${hashtag}/` },
-        { third_hashtag: `/${hashtag}/` },
+        { first_hashtag: { $regex: '.*' + hashtag + '.*' } },
+        { second_hashtag: { $regex: '.*' + hashtag + '.*' } },
+        { third_hashtag: { $regex: '.*' + hashtag + '.*' } },
       ],
     })
     .sort('-date')
@@ -40,7 +40,7 @@ async function getAnIndividualPost(postID: string) {
 
 async function getPostsByAnIndividual(userID: string) {
   const posts = await postModel
-    .find({ author: `/${userID}/` })
+    .find({ author: { $regex: '.*' + userID + '.*' } })
     .sort('-date')
     .exec();
 

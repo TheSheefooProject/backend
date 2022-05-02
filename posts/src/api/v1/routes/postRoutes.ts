@@ -14,10 +14,14 @@ postsRouter
   .get(postsController.getAnIndividualPost)
   .patch(requireAuthenticatedUser, postsController.modifyPost)
   .delete(requireAuthenticatedUser, postsController.deletePost);
-postsRouter.route('/:titleSearch').get(postsController.searchPostByTitle);
+postsRouter
+  .route('/search/:titleSearch')
+  .get(postsController.searchPostByTitle);
 postsRouter
   .route('/hashtag/:search')
   .get(postsController.SearchAllPostsbyHashtag);
-postsRouter.route('/:userID').get(postsController.getPostsByAnIndividual);
+postsRouter
+  .route('/userSearch/:userID')
+  .get(postsController.getPostsByAnIndividual);
 
 export default postsRouter;

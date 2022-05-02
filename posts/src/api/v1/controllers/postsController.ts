@@ -116,8 +116,8 @@ export const searchPostByTitle = async (
   next: NextFunction,
 ): Promise<void> => {
   let post;
-  const title = req.params.titleSearch;
   console.log('SEARCH BY TITLE', req.params);
+  const title = req.params.titleSearch;
   if (!title) {
     throw new AppError('please provide missing title criteria', 400);
   }
@@ -135,8 +135,8 @@ export const SearchAllPostsbyHashtag = async (
   next: NextFunction,
 ): Promise<void> => {
   let postResults;
-  const searchHashtag = req.params.hashtag;
-  console.log('HELLO');
+  const searchHashtag = req.params.search;
+  console.log('HELLO', searchHashtag);
   if (searchHashtag === '') {
     throw new AppError('Please provide a hashtag to search for', 400);
   }
@@ -158,11 +158,9 @@ export const getPostsByAnIndividual = async (
   next: NextFunction,
 ): Promise<void> => {
   let postsByIndividual;
-  let userID = req.params.userID;
+  const userID = req.params.userID;
   console.log('userID', userID);
 
-  userID = userID.substring(6);
-  console.log('userID', userID);
   // TODO: check userid exists
   if (!userID) {
     throw new AppError('Invalid user id supplied', 400);
