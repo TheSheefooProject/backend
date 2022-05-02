@@ -3,7 +3,7 @@ import dbHelpers from '../../helpers/dbHelpers';
 import AppError from '../../interfaces/AppError';
 import { Gender } from '../../interfaces/user';
 import { getUserData } from '../../models/user/index';
-import userModel from '../../../../db/user';
+import userModel from '../../../../db/post';
 const PASSWORD_SALT_SIZE = 10;
 
 export const generateSaltedAndHashedPassword = async (

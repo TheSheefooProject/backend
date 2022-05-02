@@ -27,16 +27,11 @@ export const validateTitle = (
 };
 
 export const validatePostFields = (req: Request) => {
-  const {
-    author: authorRaw,
-    title: titleRaw,
-    content: contentRaw,
-    imageURL: imageURLRaw,
-  } = req.body;
+  const { title, content, imageURL } = req.body;
 
   const errors = [];
-  const titleErr = validateTitle(titleRaw, 'Title');
-  const contentErr = validateTitle(contentRaw, 'Content');
+  const titleErr = validateTitle(title, 'Title');
+  const contentErr = validateTitle(content, 'Content');
   if (!titleErr.valid) {
     errors.push(titleErr.error);
   }
@@ -51,10 +46,9 @@ export const validatePostFields = (req: Request) => {
     );
   }
   return {
-    author: authorRaw,
-    title: titleRaw,
-    content: contentRaw,
-    imageURL: imageURLRaw,
+    title: title,
+    content: content,
+    imageURL: imageURL,
   };
 };
 
@@ -68,23 +62,26 @@ export const createPost = async (
       title: titleRaw,
       content: contentRaw,
       imageURL: imageURLRaw,
-    } = validatePostFields(req.body);
-    const first_hashtag = req.body.first_hashtag ? req.body.first_hashtag : '';
-    const second_hashtag = req.body.first_hashtag ? req.body.first_hashtag : '';
-    const third_hashtag = req.body.first_hashtag ? req.body.first_hashtag : '';
-    const user = String(req.user);
+    } = validatePostFields(req);
+
+    const first_hashtag = req.body.first_hashtag || '';
+    const second_hashtag = req.body.second_hashtag || '';
+    const third_hashtag = req.body.third_hashtag || '';
+    // const second_hashtag = req.body._hashtag ? req.body.first_hashtag : '';
+    // const third_hashtag = req.body.first_hashtag ? req.body.first_hashtag : '';
+    const author = req.user.id;
     const postID = await posts.createPost(
-      user,
+      author,
       titleRaw,
       contentRaw,
-      imageURLRaw,
       first_hashtag,
       second_hashtag,
       third_hashtag,
+      imageURLRaw,
     );
     res.status(200).json({
       status: 'success',
-      postID: postID,
+      postID: JSON.parse(postID),
     });
   } catch (error) {
     next(error);
@@ -97,7 +94,9 @@ export const getAnIndividualPost = async (
   next: NextFunction,
 ): Promise<void> => {
   let post;
-  const postID = req.params.post_id;
+  let postID = req.params.post_id;
+
+  postID = postID.substring(8); // Get rid of "post_id="  from request
   if (!postID) {
     throw new AppError('please provide a post id', 400);
   }
@@ -115,7 +114,8 @@ export const searchPostByTitle = async (
   next: NextFunction,
 ): Promise<void> => {
   let post;
-  const title = req.params.title;
+
+  const title = req.params.titleSearch;
   if (!title) {
     throw new AppError('please provide missing title criteria', 400);
   }
@@ -133,7 +133,8 @@ export const SearchAllPostsbyHashtag = async (
   next: NextFunction,
 ): Promise<void> => {
   let postResults;
-  const searchHashtag = req.params.hashtag;
+  const searchHashtag = req.params.search;
+
   if (searchHashtag === '') {
     throw new AppError('Please provide a hashtag to search for', 400);
   }
@@ -155,8 +156,7 @@ export const getPostsByAnIndividual = async (
   next: NextFunction,
 ): Promise<void> => {
   let postsByIndividual;
-  const userID = req.body.userID;
-  // TODO: check userid exists
+  const userID = req.params.userID;
   if (!userID) {
     throw new AppError('Invalid user id supplied', 400);
   }
@@ -176,12 +176,12 @@ export const getAllPosts = async (
 ): Promise<void> => {
   let allPosts;
   try {
-    res.status(200).json({ status: 'success' });
-    // allPosts = await posts.getAllPosts();
-    // res.status(200).json({
-    //   allPosts: allPosts,
-    //   status: 'success',
-    // });
+    // res.status(200).json({ status: 'success' });
+    allPosts = await posts.getAllPosts();
+    res.status(200).json({
+      allPosts: allPosts,
+      status: 'success',
+    });
   } catch (error) {
     next(error);
     return;
@@ -194,23 +194,31 @@ export const modifyPost = async (
   next: NextFunction,
 ): Promise<void> => {
   let Posts;
-  const {
-    author: authorRaw,
-    title: TitleRaw,
-    content: ContentRaw,
-    imageURL: imageURLRaw,
-  } = validatePostFields(req.body);
-  const postID = req.body.postID;
+
+  const { title: title, content: content, imageURL: imageURL } = req.body;
+
+  const postID = req.params.post_id.substring(8);
   try {
-    Posts = await posts.modifyPost(
-      postID,
-      authorRaw,
-      TitleRaw,
-      ContentRaw,
-      imageURLRaw,
-    );
+    const errors = [];
+    const titleErr = validateTitle(title, 'Title');
+    const contentErr = validateTitle(content, 'Content');
+    if (!titleErr.valid) {
+      errors.push(titleErr.error);
+    }
+    if (!contentErr.valid) {
+      errors.push(contentErr.error);
+    }
+    if (errors.length > 0) {
+      throw new AppError(
+        `There were some errors trying to create your post. There were ${errors.length} errors`,
+        401,
+        { validationErrors: errors },
+      );
+    }
+    const updatedimageURL = imageURL ? imageURL : '';
+    Posts = await posts.modifyPost(postID, title, content, updatedimageURL);
     res.status(200).json({
-      Posts: Posts,
+      Posts: JSON.parse(Posts),
       postID: postID,
       status: 'success',
     });
@@ -225,12 +233,12 @@ export const deletePost = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  const postID = req.body.post_id;
-  const user = String(req.user);
+  const postID = req.params.post_id.substring(8);
+  const user = String(req.user.id);
   try {
     const delPost = await posts.deletePost(postID, user);
     res.status(200).json({
-      delPost: delPost,
+      delPost: JSON.stringify(delPost),
       status: 'success',
     });
   } catch (error) {

@@ -4,17 +4,24 @@ import { requireAuthenticatedUser } from '../middleware/requireAuthenticatedUser
 
 const postsRouter = express.Router();
 
-postsRouter.route('/').get(postsController.getAllPosts);
+postsRouter
+  .route('/')
+  .get(postsController.getAllPosts)
+  .post(requireAuthenticatedUser, postsController.createPost);
+
 postsRouter
   .route('/:post_id')
   .get(postsController.getAnIndividualPost)
-  .post(postsController.createPost)
-  .patch(postsController.modifyPost)
-  .delete(postsController.deletePost);
-postsRouter.route('/:titlesearch').get(postsController.searchPostByTitle);
+  .patch(requireAuthenticatedUser, postsController.modifyPost)
+  .delete(requireAuthenticatedUser, postsController.deletePost);
 postsRouter
-  .route('/:hashtagsearch')
+  .route('/search/:titleSearch')
+  .get(postsController.searchPostByTitle);
+postsRouter
+  .route('/hashtag/:search')
   .get(postsController.SearchAllPostsbyHashtag);
-postsRouter.route('/:userID').get(postsController.getPostsByAnIndividual);
+postsRouter
+  .route('/userSearch/:userID')
+  .get(postsController.getPostsByAnIndividual);
 
 export default postsRouter;

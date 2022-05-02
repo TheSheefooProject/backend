@@ -1,10 +1,10 @@
 const dbConfigPosts = {
   HOST: 'localhost',
   USER: 'postgres',
-  PASSWORD: 'example',
-  DB: 'posts',
-  dialect: 'postgres',
-  port: 8080,
+  PASSWORD: 'password',
+  DB: 'posts-db',
+  dialect: 'sqlite',
+  port: 27018,
   pool: {
     max: 5,
     min: 0,

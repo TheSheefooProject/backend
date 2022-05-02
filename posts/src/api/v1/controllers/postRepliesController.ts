@@ -27,12 +27,10 @@ export const validateTitle = (
   return { valid: !Boolean(error), error, value: titleRaw };
 };
 
-export const validatePostRepliesFields = (req: Request) => {
-  const {
-    author: authorRaw,
-    content: contentRaw,
-    postId: postIdRaw,
-  } = req.body;
+export const validatePostRepliesFields = (
+  contentRaw: string,
+  postIdRaw: string,
+) => {
   if (!posts.getAnIndividualPost(postIdRaw)) {
     throw new AppError('unable to find the post', 404);
   }
@@ -49,7 +47,6 @@ export const validatePostRepliesFields = (req: Request) => {
     );
   }
   return {
-    author: authorRaw,
     content: contentRaw,
     postId: postIdRaw,
   };
@@ -61,15 +58,15 @@ export const createPostReply = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const {
-      author: authorRaw,
-      content: contentRaw,
-      postId: PostIdRaw,
-    } = validatePostRepliesFields(req.body);
+    const content = req.body.content;
+    const postID = req.params.post_id.substring(8);
+    const { content: contentRaw, postId: PostIdRaw } =
+      validatePostRepliesFields(content, postID);
+
     const postReplyId = await postsReplies.createPostReply(
-      authorRaw,
+      req.user.id,
       contentRaw,
-      PostIdRaw,
+      String(postID),
     );
     res.status(200).json({ status: 'success', postReplyId: postReplyId });
   } catch (error) {
@@ -84,7 +81,7 @@ export const getPostReplies = async (
 ): Promise<void> => {
   let postRepliesForId;
   try {
-    const postId = req.params.post_id;
+    const postId = req.params.post_id.substring(14);
     if (!postId) {
       throw new AppError('Please provide post id to find replies ', 400);
     }
@@ -101,22 +98,27 @@ export const modifyPostReply = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  let postReplyToModify;
-  const { postReplyID: postReplyIDRaw, content: contentRaw } = req.body;
-  if (contentRaw.length < 1) {
-    throw new AppError('Please provide body for the reply', 500);
-  }
-  if (!postReplyIDRaw) {
-    throw new AppError('Please provide post reply id to update ', 400);
-  }
   try {
-    postReplyToModify = await postsReplies.modifyPostReply(
+    const postReplyIDRaw = req.params.post_reply_id;
+    const content = req.body.content;
+    let postID = await postsReplies.getPostReplybyID(postReplyIDRaw);
+    postID = postID['post_id'];
+
+    if (content.length < 1) {
+      throw new AppError('Content must be provided', 500);
+    }
+    if (!postReplyIDRaw) {
+      throw new AppError('Please provide post reply id to update ', 400);
+    }
+
+    const postReplyToModify = await postsReplies.modifyPostReply(
       postReplyIDRaw,
-      contentRaw,
+      content,
     );
     res
       .status(200)
       .json({ status: 'success', postReplyToModify: postReplyToModify });
+    return;
   } catch (error) {
     next(error);
   }
@@ -129,9 +131,9 @@ export const getPostReplybyID = async (
 ): Promise<void> => {
   let postReply;
   try {
-    const postReplyIDRaw = req.params.post_replies_id;
+    const postReplyIDRaw = req.params.post_reply_id;
     if (!postReplyIDRaw) {
-      throw new AppError('Please provide post reply id to update ', 400);
+      throw new AppError('Please provide a valid post reply id ', 400);
     }
 
     postReply = await postsReplies.getPostReplybyID(postReplyIDRaw);
@@ -149,8 +151,8 @@ export const deletePostReply = async (
   let postReplyToDelete;
   try {
     postReplyToDelete = await postsReplies.deletePostReply(
-      req.params.post_replies_id,
-      req.params.author,
+      req.params.post_reply_id,
+      req.user.id,
     );
     res
       .status(200)
