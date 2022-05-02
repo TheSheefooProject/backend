@@ -15,8 +15,7 @@ export const generateSaltedAndHashedPassword = async (
 };
 
 export const createUser = async (
-  forename: string,
-  surname: string,
+  full_name: string,
   username: string,
   email: string,
   passwordHash: string,
@@ -29,8 +28,7 @@ export const createUser = async (
     password: passwordHashedAndSalted,
     email: email,
     verified_email: false,
-    first_name: forename,
-    last_name: surname,
+    full_name,
   });
   try {
     await newUserClass.save();

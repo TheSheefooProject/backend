@@ -51,9 +51,9 @@ export const updateUserDetailsInDB = async (
   newEmail?: string,
   newPassword?: string,
   newUsername?: string,
-  newFirstName?: string,
-  newLastName?: string,
+  newFullName?: string,
   newProfilePicURL?: string,
+  newUserBio?: string,
 ): Promise<void> => {
   const updateObject: any = {};
   if (newEmail) {
@@ -65,15 +65,16 @@ export const updateUserDetailsInDB = async (
   if (newPassword) {
     updateObject['password'] = newPassword;
   }
-  if (newFirstName) {
-    updateObject['first_name'] = newFirstName;
-  }
-  if (newLastName) {
-    updateObject['last_name'] = newLastName;
+  if (newFullName) {
+    updateObject['full_name'] = newFullName;
   }
   if (newProfilePicURL) {
     updateObject['profile_pic_url'] = newProfilePicURL;
   }
+  if (newUserBio) {
+    updateObject['user_bio'] = newUserBio;
+  }
+
   try {
     await User.findOneAndUpdate({ id }, updateObject);
   } catch (e) {

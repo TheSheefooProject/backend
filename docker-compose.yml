@@ -38,3 +38,26 @@ services:
 
   # authentication-cache:
   #   image: redis
+
+####################### Live chat servers and services ######################
+  live-chat-server:
+    build: 
+      context: ./live_chat
+      dockerfile: 'Dockerfile'
+    env_file:
+      - ./live_chat/.env
+    environment:
+      - NODE_ENV='PRODUCTION'
+    restart: always
+    depends_on:
+      - live-chat-db
+
+  live-chat-db:
+    restart: always
+    image: mongo
+    env_file:
+      - ./authentication/.env
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+

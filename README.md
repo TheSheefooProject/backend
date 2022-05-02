@@ -17,3 +17,6 @@ The below command should be run only if the above command did not work. After ru
 `docker system prune -a`
 
 Run redis instance
+
+### Live server stuff
+`docker run -d --name live-chat-db2 -v ~/mongo/data:/data/db -p 27020:27017 mongo:latest`
