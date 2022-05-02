@@ -27,7 +27,6 @@ export const validateTitle = (
 };
 
 export const validatePostFields = (req: Request) => {
-  console.log(req.body);
   const { title, content, imageURL } = req.body;
 
   const errors = [];
@@ -64,7 +63,7 @@ export const createPost = async (
       content: contentRaw,
       imageURL: imageURLRaw,
     } = validatePostFields(req);
-    console.log('req.body', req.body);
+
     const first_hashtag = req.body.first_hashtag || '';
     const second_hashtag = req.body.second_hashtag || '';
     const third_hashtag = req.body.third_hashtag || '';
@@ -96,7 +95,6 @@ export const getAnIndividualPost = async (
 ): Promise<void> => {
   let post;
   let postID = req.params.post_id;
-  console.log('HERE INDIV');
 
   postID = postID.substring(8); // Get rid of "post_id="  from request
   if (!postID) {
@@ -116,7 +114,7 @@ export const searchPostByTitle = async (
   next: NextFunction,
 ): Promise<void> => {
   let post;
-  console.log('SEARCH BY TITLE', req.params);
+
   const title = req.params.titleSearch;
   if (!title) {
     throw new AppError('please provide missing title criteria', 400);
@@ -136,7 +134,7 @@ export const SearchAllPostsbyHashtag = async (
 ): Promise<void> => {
   let postResults;
   const searchHashtag = req.params.search;
-  console.log('HELLO', searchHashtag);
+
   if (searchHashtag === '') {
     throw new AppError('Please provide a hashtag to search for', 400);
   }
@@ -159,9 +157,6 @@ export const getPostsByAnIndividual = async (
 ): Promise<void> => {
   let postsByIndividual;
   const userID = req.params.userID;
-  console.log('userID', userID);
-
-  // TODO: check userid exists
   if (!userID) {
     throw new AppError('Invalid user id supplied', 400);
   }
@@ -199,7 +194,6 @@ export const modifyPost = async (
   next: NextFunction,
 ): Promise<void> => {
   let Posts;
-  console.log('modify', req.body, req.params.post_id);
 
   const { title: title, content: content, imageURL: imageURL } = req.body;
 

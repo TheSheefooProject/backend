@@ -12,7 +12,7 @@ async function SearchAllPostsbyTitle(titleQuery: string) {
     .find({ title: { $regex: '.*' + titleQuery + '.*' } })
     .sort('-date')
     .exec();
-  console.log(posts);
+
   return posts;
 }
 
@@ -27,14 +27,13 @@ async function SearchAllPostsbyHashtag(hashtag: string) {
     })
     .sort('-date')
     .exec();
-  console.log(posts);
+
   return posts;
 }
 
 async function getAnIndividualPost(postID: string) {
   const posts = await postModel.findById(postID);
 
-  console.log(posts);
   return posts;
 }
 
@@ -44,7 +43,6 @@ async function getPostsByAnIndividual(userID: string) {
     .sort('-date')
     .exec();
 
-  console.log(posts);
   return posts;
 }
 
@@ -72,13 +70,11 @@ export const createPost = async (
       ],
     })
     .exec();
-  console.log(postExists);
+
   if (postExists.length > 0) {
     throw new AppError('Post already exists', 500);
   }
-  console.log('HERE: ', first_hashtag);
   if (imageURL === '') {
-    // TODO: change to new post model as per jeesons thing in auth user
     newPost = await postModel.create(
       {
         author,
@@ -91,18 +87,7 @@ export const createPost = async (
       },
       { returning: ['_id'] },
     );
-    // TODO: maybe add a random stock image if no image
-    // query =
-    //   "INSERT INTO posts (author, title, content, time_created, image_url) values ('" +
-    //   author +
-    //   "', '" +
-    //   title +
-    //   "', '" +
-    //   content +
-    //   "', ' '";
   } else {
-    console.log('HERE2');
-
     newPost = await postModel.create(
       {
         author: author,
@@ -115,9 +100,7 @@ export const createPost = async (
       { returning: ['_id'] },
     );
   }
-  console.log(newPost);
   return JSON.stringify(newPost);
-
   // author will be req.user.id once auth is done
 };
 
@@ -128,14 +111,11 @@ export const deletePost = async (
   let results;
   try {
     const query = { _id: postID };
-    console.log(postID, ', ', curUser);
 
     results = await postModel.deleteOne({ _id: postID });
   } catch (error) {
     throw new AppError('Post being deleted doesnt exist', 500);
-  } // const query = "DELETE FROM posts where postID=" + postID;
-  // const results = await sequelize.query(query);
-  // console.log(results);
+  }
   return JSON.stringify(results);
 };
 
@@ -161,7 +141,6 @@ export const modifyPost = async (
         imageURL: imageURL,
       };
     }
-    console.log(`Modifications to ${postID}: `, modifications);
 
     post = await postModel.findOneAndUpdate(
       { id: postID },
@@ -172,10 +151,8 @@ export const modifyPost = async (
       },
     );
   } catch (error) {
-    console.log('error updating post: ' + postID + ', ' + error);
     throw new AppError('unable to update post', 500, error);
   }
-  console.log(post.modifiedCount);
 
   const res = JSON.stringify(post);
   return res;
