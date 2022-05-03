@@ -1,0 +1,47 @@
+/* Theme Variables */
+.theme-light {
+  /* Background Colours */
+  /*# */
+  --color-back-1: 240 200 160;
+  /*# */
+  --color-back-2: 240 210 190;
+  /*# */
+  --color-back-3: 245 240 235;
+  /*# */
+  --color-back-4: 255 255 255;
+  /* Text Colours */
+  /*# */
+  --color-text-1: 32 34 37;
+  /*# */
+  --color-text-2: 78 78 78;
+
+  /* Accent/Element Colours */
+  /*# */
+  --color-accent-1: 255 153 105;
+  /*# */
+  --color-accent-2: 255 105 105;
+}
+
+.theme-dark {
+  /* Background Colours */
+  /*# */
+  --color-back-1: 32 34 37;
+  /*# */
+  --color-back-2: 47 49 54;
+  /*# */
+  --color-back-3: 54 57 63;
+  /*# */
+  --color-back-4: 80 84 92;
+
+  /* Text Colours */
+  /*# */
+  --color-text-1: 250 250 250;
+  /*# */
+  --color-text-2: 238 238 238;
+
+  /* Accent/Element Colours */
+  /*# */
+  --color-accent-1: 255 153 105;
+  /*# */
+  --color-accent-2: 255 105 105;
+}

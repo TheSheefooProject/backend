@@ -1,0 +1,41 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Fredoka';
+  src: url('/fonts/Fredoka_Variable.ttf');
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.has-tooltip:hover .tooltip {
+  visibility: visible;
+  opacity: 1;
+}
+
+/*Tooltip*/
+.has-tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+/* Scrollbar Styling */
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #888;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #555;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #ff6969;
+}
