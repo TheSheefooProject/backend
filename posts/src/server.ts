@@ -1,5 +1,5 @@
 import morgan from 'morgan';
-import config from './config/dbConfig';
+import { client } from './redis';
 import app from './app';
 import mongoose from 'mongoose';
 
@@ -13,6 +13,16 @@ mongoose
   .then(() => {
     console.log('Database connection made');
 
+    client
+      .connect()
+      .then(() => {
+        console.log('cache connection established');
+      })
+      .catch(() => {
+        'Failed starting redis cache';
+      });
+    // // create redis client Connect to redis at 127.0.0.1 port 6379 no password.
+
     /**
      * Start Express server.
      */
@@ -22,7 +32,7 @@ mongoose
         process.env.NODE_PORT,
         process.env.NODE_ENV,
       );
-      console.log('Press CTRL-C to stop\n');
+      console.log('Press CTRL-C to  stop\n');
     });
   })
   .catch(e => {

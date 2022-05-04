@@ -36,14 +36,6 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${DB_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
-  # authentication-cache:
-  #   image: redis:6.2-alpine
-  #   restart: always
-  #   ports:
-  #     - '6379:6379'
-  #   command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
-  #   volumes: 
-  #     - cache:/data
 
 ####################### Live chat servers and services ######################
   live-chat-server:
@@ -83,6 +75,7 @@ services:
     restart: always
     depends_on:
       - posts-db
+      - posts-cache
   posts-db:
     restart: always
     image: mongo
@@ -91,6 +84,16 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${DB_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
+
+
+  posts-cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning
+    volumes: 
+      - ./redis-posts-cache:/data
 
 ####################### Start up front end service ######################
   frontend-server:
@@ -106,5 +109,3 @@ services:
       - live-chat-server
 
 # //! TODO: Enable caching
-#           Mount voulms to local
-#           Detemrine if the conenction is present.s

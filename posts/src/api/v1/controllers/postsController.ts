@@ -1,6 +1,10 @@
 import AppError from '../interfaces/AppError';
 import { NextFunction, Request, Response } from 'express';
 import posts from '../models/posts/posts';
+import * as redis from 'redis';
+import { promisify } from 'util';
+import { client, getAsync, setAsync } from '../../../redis';
+import { crossOriginOpenerPolicy } from 'helmet';
 
 interface validationStatus {
   valid: boolean;
@@ -132,18 +136,31 @@ export const SearchAllPostsbyHashtag = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  let postResults;
-  const searchHashtag = req.params.search;
-
-  if (searchHashtag === '') {
-    throw new AppError('Please provide a hashtag to search for', 400);
-  }
-  if (searchHashtag.length > 50) {
-    throw new AppError('Please enter a hashtag less than 50 characters', 422);
-  }
-
   try {
-    postResults = await posts.SearchAllPostsbyHashtag(searchHashtag);
+    const searchHashtag = req.params.search;
+    if (searchHashtag === '') {
+      throw new AppError('Please provide a hashtag to search for', 400);
+    }
+    if (searchHashtag.length > 50) {
+      throw new AppError('Please enter a hashtag less than 50 characters', 422);
+    }
+    const cacheResult = await client.get(`HASHTAG_${searchHashtag}`);
+    if (cacheResult) {
+      console.log('Got search hashtag result from cache');
+      res.status(200).json({
+        postResults: JSON.parse(cacheResult),
+        status: 'success',
+      });
+      return;
+    }
+
+    const postResults = await posts.SearchAllPostsbyHashtag(searchHashtag);
+    await client.setEx(
+      `HASHTAG_${searchHashtag}`,
+      20,
+      JSON.stringify(postResults),
+    );
+
     res.status(200).json({ status: 'success', postResults: postResults });
   } catch (error) {
     next(error);
@@ -174,15 +191,28 @@ export const getAllPosts = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  let allPosts;
   try {
-    // res.status(200).json({ status: 'success' });
-    allPosts = await posts.getAllPosts();
+    const cacheResult = await client.get('ALL_SERVER_POSTS');
+    if (cacheResult) {
+      console.log('Got All posts result from cache');
+      res.status(200).json({
+        allPosts: JSON.parse(cacheResult),
+        status: 'success',
+      });
+      return;
+    }
+
+    const allPosts = await posts.getAllPosts();
+    await client.setEx('ALL_SERVER_POSTS', 20, JSON.stringify(allPosts));
+
     res.status(200).json({
       allPosts: allPosts,
       status: 'success',
     });
+    return;
   } catch (error) {
+    console.log(error);
+
     next(error);
     return;
   }

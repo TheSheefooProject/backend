@@ -9,7 +9,7 @@ import { requireAuthenticatedUser } from '../middleware/requireAuthenticatedUser
 
 const userRouter = express.Router();
 
-userRouter.route('/:username').get(checkUsernameExists);
+userRouter.route('/username/:username').get(checkUsernameExists);
 
 userRouter
   .route('/')

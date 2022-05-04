@@ -14,6 +14,9 @@ export async function requireAuthenticatedUser(
   const connectionString =
     'http://authentication-server:3000/v1/internal/verify';
 
+  //Below is for development
+  // const connectionString = 'http://localhost:3000/v1/internal/verify';
+
   const headers = {
     headers: {
       Authorization: 'Bearer ' + accessToken,

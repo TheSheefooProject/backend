@@ -78,25 +78,14 @@ export async function get_user_details_api(token: string) {
     return e
   }
 }
-//TODO
 
 export async function check_username_api(username: string) {
-  const CONNECTION_STRING = 'http://localhost:80/api/auth/v1/user/' + username
-
-  let outcome = false
-
   try {
-    const response = await axios.get(CONNECTION_STRING)
-
-    if (response.data.status == 'success') {
-      outcome = false
-    }
+    await axios.get(`http://localhost:80/api/auth/v1/user/username/${username}`)
+    return false
   } catch (e) {
-    console.log(e)
-    outcome = true
+    return true
   }
-
-  return outcome
 }
 
 type API_TYPES = 'GET' | 'POST' | 'PATCH' | 'DELETE'
