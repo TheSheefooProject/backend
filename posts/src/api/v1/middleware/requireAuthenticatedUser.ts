@@ -11,10 +11,9 @@ export async function requireAuthenticatedUser(
   const refreshToken = _extractRefreshToken(req);
 
   //Setting up the db connection
-  let connectionString = 'http://localhost:80/v1/internal/verify';
-  if (process.env.NODE_ENV === 'DEVELOPMENT') {
-    connectionString = 'http://localhost:3000/v1/internal/verify';
-  }
+  const connectionString =
+    'http://authentication-server:3000/v1/internal/verify';
+
   const headers = {
     headers: {
       Authorization: 'Bearer ' + accessToken,

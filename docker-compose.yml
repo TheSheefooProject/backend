@@ -25,8 +25,8 @@ services:
     restart: always
     depends_on:
       - authentication-db
-    ports:
-      - 3005:3005
+    # ports:
+    #   - 3000:3000
 
   authentication-db:
     restart: always
@@ -36,9 +36,14 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: ${DB_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
-
   # authentication-cache:
-  #   image: redis
+  #   image: redis:6.2-alpine
+  #   restart: always
+  #   ports:
+  #     - '6379:6379'
+  #   command: redis-server --save 20 1 --loglevel warning --requirepass eYVX7EwVmmxKPCDmwMtyKVge8oLd2t81
+  #   volumes: 
+  #     - cache:/data
 
 ####################### Live chat servers and services ######################
   live-chat-server:
@@ -52,6 +57,8 @@ services:
     restart: always
     depends_on:
       - live-chat-db
+    ports:
+      - 3005:3005
 
   live-chat-db:
     restart: always
@@ -85,4 +92,19 @@ services:
       MONGO_INITDB_ROOT_USERNAME: ${DB_USERNAME}
       MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD}
 
+####################### Start up front end service ######################
+  frontend-server:
+    build: 
+      context: ./frontend
+      dockerfile: 'Dockerfile'
+    environment:
+      - NODE_ENV='PRODUCTION'
+    restart: always
+    depends_on:
+      - posts-server
+      - authentication-server
+      - live-chat-server
 
+# //! TODO: Enable caching
+#           Mount voulms to local
+#           Detemrine if the conenction is present.s

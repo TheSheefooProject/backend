@@ -4,7 +4,7 @@ dotenv.config();
 const sqlConfig = {
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || 'root',
-  database: process.env.DB_NAME || 'safeknight-backend',
+  database: process.env.DB_NAME || 'sheefoo-backend',
   server: process.env.DB_SERVER || 'localhost',
   pool: {
     max: 10,

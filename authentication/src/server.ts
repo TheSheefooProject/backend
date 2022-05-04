@@ -11,7 +11,7 @@ if (process.env.NODE_ENV === 'DEVELOPMENT') {
  * Connect to the mongoose database, and if successful start express server
  */
 mongoose
-  .connect('mongodb://localhost:27017/authentication-db')
+  .connect('mongodb://authentication-db:27017/authentication-db')
   .then(() => {
     console.log('Database connection made');
 
@@ -20,7 +20,7 @@ mongoose
      */
     app.listen(process.env.NODE_PORT || 3000, () => {
       console.log(
-        'App is running at http://localhost:%d in %s mode',
+        'App is running at http://authentication-db:%d in %s mode',
         process.env.NODE_PORT,
         process.env.NODE_ENV,
       );

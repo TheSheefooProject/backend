@@ -51,7 +51,7 @@ io.on('connect', (socket) => {
     const user = getUser(socket.id);
     io.to(user.room).emit('message', {
       id: user.user_id,
-      userName: user.name,
+      user_name: user.name,
       message,
     });
     callback();
@@ -70,12 +70,12 @@ io.on('connect', (socket) => {
 });
 // Below code actually startup the server
 mongoose
-  .connect('mongodb://localhost:27020/live-chat-db')
+  .connect('mongodb://live-chat-db:27017/live-chat-db')
   .then(() => {
     console.log('Database connection made');
     server.listen(process.env.NODE_PORT || 3005, () => {
       console.log(
-        'App is running at http://localhost:%d in %s mode',
+        'App is running at http://live-chat-db:%d in %s mode',
         process.env.NODE_PORT,
         process.env.NODE_ENV
       );

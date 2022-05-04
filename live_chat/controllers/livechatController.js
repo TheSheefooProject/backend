@@ -49,9 +49,11 @@ export const searchRooms = async (req, res, next) => {
   try {
     const searchTerm = req.params.searchterm;
     const searchResult = await Rooms.find({
-      chat_room_id: { $regex: '.*' + searchTerm+ '.*' } })
-    .sort('-date').limit(50);
-    
+      chat_room_id: { $regex: '.*' + searchTerm + '.*' },
+    })
+      .sort('-date')
+      .limit(50);
+
     return res.status(200).json({ status: 'success', searchResult });
   } catch (e) {
     next(e);

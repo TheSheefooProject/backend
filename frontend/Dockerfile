@@ -1,23 +1,23 @@
-# TODO this needs changin
-FROM node:14-alpine as base
-# Setup the alpine image
-RUN apk add --no-cache git
-WORKDIR /usr/app
+FROM node:lts as dependencies
+WORKDIR /my-project
+COPY package.json ./
+RUN npm install
 
-# Setup the node enviroment varibales
-#TODO! FIGURE OUT WHAT TO DO FOR THE REMAINING ENVIROMENT VARIABLES
-ENV NODE_ENV='PRODUCTION'
-ENV NODE_PORT=3001
-EXPOSE 3001
-
-# Install the production dependancies
-COPY ./package.json ./
-RUN npm install --only=prod
-
-# App source
+FROM node:lts as builder
+WORKDIR /my-project
 COPY . .
+COPY --from=dependencies /my-project/node_modules ./node_modules
+RUN npm run build
 
-# Create the run build 
-RUN npm run build:ts
+FROM node:lts as runner
+WORKDIR /my-project
+ENV NODE_ENV production
 
-CMD ["node", "dist/src/server.js"]
+COPY --from=builder /my-project/next.config.js ./
+COPY --from=builder /my-project/public ./public
+COPY --from=builder /my-project/.next ./.next
+COPY --from=builder /my-project/node_modules ./node_modules
+COPY --from=builder /my-project/package.json ./package.json
+
+EXPOSE 3069
+CMD ["npm","run","docker"]

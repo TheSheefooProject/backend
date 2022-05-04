@@ -16,7 +16,7 @@ export const validOrganizationEmail = (email: string): boolean => {
 //* Below methods are for verification email generation
 export const sendVerificationEmail = async (
   emailToSendTo: string,
-  currentHostname = 'http://localhost:3000',
+  currentHostname = 'http://localhost:80',
   userID: string,
 ): Promise<void> => {
   SendGrid.setApiKey(process.env.SEND_GRID_API);

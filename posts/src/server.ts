@@ -9,7 +9,7 @@ if (process.env.NODE_ENV === 'DEVELOPMENT') {
 }
 
 mongoose
-  .connect('mongodb://localhost:27018/post-db')
+  .connect('mongodb://posts-db:27017/post-db')
   .then(() => {
     console.log('Database connection made');
 

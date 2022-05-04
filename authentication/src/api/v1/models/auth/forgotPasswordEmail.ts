@@ -93,7 +93,7 @@ export const decreaseCurrentAttempt = async (
   const updatedVerificationString = `${verificationCodesArray[0]}:${
     verificationCodesArray[1]
   }:${currentAttempt - 1}`;
-  await updateForgotEmailVerificationCodeDB(id, updatedVerificationString);
+  // await updateForgotEmailVerificationCodeDB(id, updatedVerificationString);
 };
 
 //* Below methods are for verification email generation

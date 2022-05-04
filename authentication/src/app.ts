@@ -33,7 +33,6 @@ app.all('*', (req, res) => {
   res.status(404).json({
     type: 'errors',
     message: 'The API endpoint is not valid',
-    test: '2',
     current: req.protocol + '://' + req.get('host') + req.originalUrl,
   });
 });
