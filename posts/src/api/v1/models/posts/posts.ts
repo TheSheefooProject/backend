@@ -58,22 +58,23 @@ export const createPost = async (
   const curtime = Date.now();
   let newPost;
 
-  const postExists = await postModel
-    .find({
-      $and: [
-        { author: `/${author}/` },
-        { title: `/${title}/` },
-        { content: `/${content}/` },
-        { first_hashtag: `/${first_hashtag}/` },
-        { second_hashtag: `/${second_hashtag}/` },
-        { third_hashtag: `/${third_hashtag}/` },
-      ],
-    })
-    .exec();
+  // const postExists = await postModel
+  //   .find({
+  //     $and: [
+  //       { author: `/${author}/` },
+  //       { title: `/${title}/` },
+  //       { content: `/${content}/` },
+  //       { first_hashtag: `/${first_hashtag}/` },
+  //       { second_hashtag: `/${second_hashtag}/` },
+  //       { third_hashtag: `/${third_hashtag}/` },
+  //     ],
+  //   })
+  //   .exec();
 
-  if (postExists.length > 0) {
-    throw new AppError('Post already exists', 500);
-  }
+  // if (postExists.length > 0) {
+  //   throw new AppError('Post already exists', 500);
+  // }
+  
   if (imageURL === '') {
     newPost = await postModel.create(
       {
@@ -96,6 +97,8 @@ export const createPost = async (
         time_created: curtime,
         imageURL: imageURL,
         first_hashtag: first_hashtag,
+        second_hashtag: second_hashtag,
+        third_hashtag: third_hashtag,
       },
       { returning: ['_id'] },
     );
