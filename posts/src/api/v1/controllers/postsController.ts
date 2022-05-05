@@ -71,6 +71,11 @@ export const createPost = async (
     const first_hashtag = req.body.first_hashtag || '';
     const second_hashtag = req.body.second_hashtag || '';
     const third_hashtag = req.body.third_hashtag || '';
+    console.log(first_hashtag);
+    console.log(second_hashtag);
+    console.log(third_hashtag);
+    console.log(imageURLRaw);
+
     // const second_hashtag = req.body._hashtag ? req.body.first_hashtag : '';
     // const third_hashtag = req.body.first_hashtag ? req.body.first_hashtag : '';
     const author = req.user.id;
