@@ -113,6 +113,34 @@ export const updateUserDetails = async (
   }
 };
 
+export const getGetUserDetailsBasedOnID = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const userID = req.params.id;
+    const userData = await getUserData(userID, 'ID', true);
+
+    if (!userData) {
+      throw new AppError('User account has probably been deleted', 400);
+    }
+    res.status(200).json({
+      status: 'success',
+      data: {
+        profile_pic_url: userData.profile_pic_url,
+        username: userData.username,
+        full_name: userData.full_name,
+        user_bio: userData.user_bio,
+      },
+    });
+    return;
+  } catch (e) {
+    next(e);
+    return;
+  }
+};
+
 /**
  * Get the user
  * @route DELETE /user
@@ -141,6 +169,7 @@ export const deleteUser = async (
 };
 export default {
   getUserDetails,
+  getGetUserDetailsBasedOnID,
   checkUsernameExists,
   deleteUser,
   updateUserDetails,
