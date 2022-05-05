@@ -24,7 +24,7 @@ const postSchema = new Schema(
     third_hashtag: {
       type: String,
     },
-    image_url: {
+    imageURL: {
       type: String,
     },
   },
