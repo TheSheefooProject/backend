@@ -63,7 +63,7 @@ export const getGetUserDetailsBasedOnID = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    const userID = req.params.userID;
+    const userID = req.params.id;
     const userData = await getUserData(userID, 'ID', true);
 
     if (!userData) {
