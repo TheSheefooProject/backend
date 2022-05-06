@@ -76,7 +76,7 @@ export const updateUserDetailsInDB = async (
   }
 
   try {
-    await User.findOneAndUpdate({ id }, updateObject);
+    await User.findOneAndUpdate({ _id: id }, updateObject);
   } catch (e) {
     throw new AppError('Internal server changing user data.');
   }
