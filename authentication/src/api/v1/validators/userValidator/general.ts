@@ -108,6 +108,21 @@ export const validatePassword = (
       value: password,
     };
   }
+  if (password.length <= 6) {
+    return {
+      valid: false,
+      error: 'password must be bigger than 6',
+      value: password,
+    };
+  }
+
+  if (password.length >= 18) {
+    return {
+      valid: false,
+      error: 'password must be smaller than 18',
+      value: password,
+    };
+  }
   return { valid: true, error: '', value: password };
 };
 
