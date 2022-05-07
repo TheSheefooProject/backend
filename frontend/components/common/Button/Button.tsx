@@ -46,7 +46,7 @@ const Button = (props: {
         className +
         ' ' +
         styles.btn +
-        ' h-8 w-[100%] px-2 py-0 font-body font-medium text-white shadow-md hover:scale-95 hover:shadow-none '
+        ' h-8 w-[100%] px-2 py-0 font-body font-medium text-white shadow-md transition-transform hover:scale-95 hover:shadow-none motion-reduce:transition-none motion-reduce:hover:scale-100 motion-reduce:hover:brightness-90 '
       }`}
       onClick={onClick}
     >

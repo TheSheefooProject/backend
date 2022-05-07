@@ -43,7 +43,7 @@ const Tooltip = (props: {
       style={SIDES[side]}
       className={`${
         styles.tooltip +
-        ' tooltip bg-back_4 text-text_1 after:border-y-transparent after:border-r-back_4 after:border-l-transparent ' +
+        ' tooltip bg-back_4 text-text_1 transition-opacity after:border-y-transparent after:border-r-back_4 after:border-l-transparent motion-reduce:transition-none' +
         className
       }`}
     >

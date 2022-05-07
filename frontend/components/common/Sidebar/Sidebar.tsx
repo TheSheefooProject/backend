@@ -27,7 +27,7 @@ const Sidebar = (props: { localStorage: Storage }) => {
       <div
         className={
           `${sidebar_visible ? 'w-20' : 'w-0'}` +
-          ' fixed left-0 top-0 z-50 h-[100vh] drop-shadow-lg md:w-20'
+          '  fixed left-0 top-0 z-50 h-[100vh] drop-shadow-lg md:w-20'
         }
       >
         {/* Dark Overlay */}
@@ -65,13 +65,13 @@ const Sidebar = (props: { localStorage: Storage }) => {
           }
         >
           <Link href="/">
-            <a className="has-tooltip relative mt-3 px-3 drop-shadow-lg hover:top-[1px] hover:drop-shadow-none">
+            <a className="has-tooltip  relative mt-3 px-3 drop-shadow-lg hover:top-[1px] hover:drop-shadow-none motion-reduce:hover:top-0">
               <Image src="/logo.svg" width={64} height={64}></Image>
               <Tooltip text="Home" side="right"></Tooltip>
             </a>
           </Link>
           <Link href="/messages">
-            <a className=" has-tooltip relative mt-5 drop-shadow-lg hover:top-[1px] hover:cursor-pointer hover:text-accent_2 hover:drop-shadow-none">
+            <a className=" has-tooltip  relative mt-5 drop-shadow-lg hover:top-[1px] hover:cursor-pointer hover:text-accent_2 hover:drop-shadow-none motion-reduce:hover:top-0">
               <FiMessageSquare size="3.5em"></FiMessageSquare>
               <Tooltip text="Messages" side="right"></Tooltip>
             </a>
@@ -81,7 +81,7 @@ const Sidebar = (props: { localStorage: Storage }) => {
 
           <Link href="/profile">
             <div className="relative mt-auto justify-self-end drop-shadow-lg">
-              <div className=" has-tooltip  hover:top-[1px] hover:cursor-pointer hover:text-accent_2 hover:drop-shadow-none ">
+              <div className=" has-tooltip  hover:top-[1px] hover:cursor-pointer hover:text-accent_2 hover:drop-shadow-none motion-reduce:hover:top-0">
                 <FiUser size="3.5em"></FiUser>
                 <Tooltip text="Profile" side="right"></Tooltip>
               </div>
@@ -91,13 +91,13 @@ const Sidebar = (props: { localStorage: Storage }) => {
             </div>
           </Link>
           <Link href="/settings">
-            <div className=" has-tooltip relative mt-5 justify-self-end drop-shadow-lg hover:top-[1px] hover:cursor-pointer hover:text-accent_2 hover:drop-shadow-none">
+            <div className=" has-tooltip relative mt-5 justify-self-end drop-shadow-lg hover:top-[1px] hover:cursor-pointer hover:text-accent_2 hover:drop-shadow-none motion-reduce:hover:top-0">
               <FiSettings size="3.5em"></FiSettings>
               <Tooltip text="Settings" side="right"></Tooltip>
             </div>
           </Link>
           <button
-            className=" has-tooltip relative mt-5 h-[3.5em] w-[3.5em] justify-self-end bg-transparent drop-shadow-lg hover:top-[1px] hover:cursor-pointer hover:text-accent_2 hover:drop-shadow-none"
+            className=" has-tooltip relative mt-5 h-[3.5em] w-[3.5em] justify-self-end bg-transparent drop-shadow-lg hover:top-[1px] hover:cursor-pointer hover:text-accent_2 hover:drop-shadow-none motion-reduce:hover:top-0"
             onClick={async (e: any) => {
               e.preventDefault()
               console.log(localStorage)

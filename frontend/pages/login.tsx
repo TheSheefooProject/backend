@@ -98,7 +98,6 @@ const Login = (props: { localStorage: Storage }) => {
             user_id: userDetails.userData._id,
             username: userDetails.userData.username,
             email: inEmail,
-            password: inPassword,
           })
         }
         router.push('/')

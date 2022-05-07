@@ -1,6 +1,6 @@
 import { NextPage } from 'next'
 import Image from 'next/image'
-import { SetStateAction, useRef } from 'react'
+import { SetStateAction, useEffect, useRef } from 'react'
 import { useState } from 'react'
 import React from 'react'
 import { FiPlus, FiSend } from 'react-icons/fi'
@@ -8,6 +8,8 @@ import TextBox from '../../components/common/TextBox'
 import DMFragment from './DMFragment'
 import io from 'socket.io-client'
 import axios from 'axios'
+import useSound from 'use-sound'
+import { PlayFunction } from 'use-sound/dist/types'
 
 type MessageObject = {
   message: string
@@ -18,19 +20,50 @@ const socketConnection = io('http://localhost:3005', {
   transports: ['websocket'],
 })
 
-const DirectMessagesPage: NextPage = (props) => {
+const DirectMessagesPage = (props: { localStorage: Storage }) => {
+  const { localStorage = null, ...restProps } = props
   const [activeDMS, setActiveDMS] = useState([
     { roomName: 'Global Chat', roomID: 'global' },
   ])
   const [currentTypedMessage, setCurrentTypedMessage] = useState('')
   const [currentRoomName, setCurrentRoom] = useState('global')
   const [messages, setMessages] = React.useState([
-    { message: 'test', id: 'asda', type: 'OUTGOING' },
+    {
+      message: 'test',
+      id: 'asda',
+      type: 'OUTGOING',
+      user_name: 'testusername',
+    },
   ])
+
   const [loading, setLoading] = React.useState(true)
   const [loadingOldMessages, setLoadingOldMessages] = React.useState(true)
   const [users, setUsers] = React.useState([])
   const messages_div = useRef<any>(null)
+
+  const [soundOn, setSoundOn] = useState<boolean>()
+  var sounds_disabled: boolean = false
+
+  useEffect(() => {
+    try {
+      sounds_disabled = JSON.parse(props.localStorage?.settings).disable_sounds
+    } catch (error) {}
+
+    if (sounds_disabled) {
+      setSoundOn(false)
+    } else {
+      setSoundOn(true)
+    }
+  }, [localStorage])
+
+  const [play_incoming] = useSound('/sounds/ping.mp3', {
+    volume: 1,
+    soundEnabled: soundOn,
+  })
+  const [play_outgoing] = useSound('/sounds/send_message.mp3', {
+    volume: 1,
+    soundEnabled: soundOn,
+  })
 
   //SORRY I KNOW THIS IS SPAGETTI CODE :,( BUT TIME CONSTRAINTS AND THAT.
   React.useEffect(() => {
@@ -72,6 +105,12 @@ const DirectMessagesPage: NextPage = (props) => {
       // @ts-ignore: Unreachable code error
       const type = message.id == user_id ? 'INCOMING' : 'OUTGOING'
       setMessages((messages) => [...messages, { ...message, type }])
+
+      // If new message arrives in inbox
+      if (type == 'OUTGOING') {
+        messages_div.current.scroll(0, messages_div.current.scrollHeight)
+        play_incoming()
+      }
     })
 
     socketConnection.on('roomData', ({ users }) => {
@@ -99,6 +138,8 @@ const DirectMessagesPage: NextPage = (props) => {
         socketConnection.emit('sendMessage', currentTypedMessage, () => {
           setCurrentTypedMessage('')
           messages_div.current.scroll(0, messages_div.current.scrollHeight)
+          play_outgoing()
+          console.log(soundOn)
         })
       }
     }
@@ -109,7 +150,7 @@ const DirectMessagesPage: NextPage = (props) => {
       <div className="relative flex h-16 w-full flex-row items-center justify-end gap-2 py-2">
         {activeDMS.map(({ roomID, roomName }, idx) => (
           <div
-            className="flex h-[50px] items-center border-2 border-gray-400 px-2 py-1 text-gray-400 transition-all hover:animate-pulse hover:cursor-pointer hover:rounded-md hover:border-accent_1 hover:text-accent_1"
+            className="flex h-[50px] items-center border-2 border-gray-400 px-2 py-1 text-gray-400 transition-all hover:animate-pulse hover:cursor-pointer hover:rounded-md hover:border-accent_1 hover:text-accent_1 motion-reduce:animate-none motion-reduce:transition-none"
             onClick={(e) => {
               e.preventDefault()
               setCurrentRoom(roomID)
@@ -120,7 +161,7 @@ const DirectMessagesPage: NextPage = (props) => {
         ))}
 
         <div
-          className="border-2 border-gray-100 transition-all hover:animate-pulse hover:cursor-pointer hover:rounded-md hover:border-accent_1 hover:text-accent_1"
+          className="border-2 border-gray-100 transition-all hover:animate-pulse hover:cursor-pointer hover:rounded-md hover:border-accent_1 hover:text-accent_1 motion-reduce:animate-none motion-reduce:transition-none"
           title="Start new conversation"
         >
           <FiPlus size={46}></FiPlus>
@@ -148,6 +189,7 @@ const DirectMessagesPage: NextPage = (props) => {
             text={currentTypedMessage}
             onKeyUp={(e: any) => handleSendMessage(e)}
             controlledInput={true}
+            autofocus={true}
           ></TextBox>
           <FiSend
             title="Send Message"

@@ -24,7 +24,7 @@ const DMFragment: NextPage<Props> = (props) => {
       <p className="sticky top-0 pt-4 text-center font-heading text-xl">
         Now talking to {roomName}
       </p>
-      <div id="messages_container" className="flex flex-col p-2 md:p-4">
+      <div id="messages_container" className="flex flex-col p-2  md:p-4">
         {loading ? (
           <Image
             src="/images/spinner.svg"
