@@ -41,7 +41,7 @@ export const validateRegistrationFields = (req: Request) => {
   if (error.length > 0) {
     throw new AppError(
       `Registration fields were not correct. There were ${error.length} errors`,
-      401,
+      403,
       { validationErrors: error },
     );
   }
