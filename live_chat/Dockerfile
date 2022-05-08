@@ -3,8 +3,7 @@ FROM node:14-alpine as base
 RUN apk add --no-cache git
 WORKDIR /usr/app
 
-# Setup the node enviroment varibales
-#TODO! FIGURE OUT WHAT TO DO FOR THE REMAINING ENVIROMENT VARIABLES
+# Setup the node enviroment variables
 ENV NODE_ENV='PRODUCTION'
 ENV NODE_PORT=3005
 EXPOSE 3005

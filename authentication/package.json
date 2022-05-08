@@ -25,15 +25,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/SafeKnight/backend.git"
+    "url": "git+https://github.com/TheSheefooProject/backend.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/SafeKnight/backend/issues"
+    "url": "https://github.com/TheSheefooProject/backend/issues"
   },
-  "homepage": "https://github.com/SafeKnight/backend#readme",
+  "homepage": "https://github.com/TheSheefooProject/backend#readme",
   "devDependencies": {
     "@types/async": "^3.2.12",
     "@types/bcryptjs": "^2.4.2",
