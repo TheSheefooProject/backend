@@ -25,7 +25,7 @@ export type ISettings = {
 }
 const defaultSettings = {
   text_size: 5,
-  dark: false,
+  dark: true,
   reduced_motion: false,
   disable_autoplay: false,
   disable_sounds: false,
