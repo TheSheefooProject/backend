@@ -21,6 +21,7 @@ import Tooltip from '../components/common/Tooltip'
 import Link from 'next/link'
 import { emitWarning } from 'process'
 import { useRouter } from 'next/router'
+import Head from 'next/head'
 
 const Register: NextPage = () => {
   const [inUsername, setInUsername] = useState('')
@@ -118,8 +119,11 @@ const Register: NextPage = () => {
   }
   return (
     <main className="static flex min-h-screen w-[100%] flex-col items-center justify-center overflow-x-hidden bg-back_3 px-10 pt-0 text-text_1  md:min-w-[320px] md:px-[25vw]">
+      <Head>
+        <title>Sheefoo Register</title>
+      </Head>
       {/* Profile Container */}
-      <div className="flex min-w-max flex-col items-center border-2 border-gray-200 bg-gray-300 p-2 font-body drop-shadow-lg dark:border-gray-500 dark:bg-gray-600 md:flex-row">
+      <div className="flex min-w-max flex-col items-center border-2 border-gray-300 bg-gray-400 p-2 font-body drop-shadow-lg  md:flex-row">
         <div id="loginlogo" className="m-3 h-48 w-48 drop-shadow-xl">
           <Image src="/logo.svg" width={200} height={200}></Image>
         </div>

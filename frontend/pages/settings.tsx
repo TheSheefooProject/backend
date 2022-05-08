@@ -44,7 +44,7 @@ const SettingsPage = (props: {
   return (
     <main className="md:[5vw] static min-h-screen w-[100%] min-w-[320px] overflow-x-hidden bg-back_3 px-10 pt-12 md:px-[calc(20vw+5rem)]">
       <Head>
-        <title>Sheefoo | Dev Page</title>
+        <title>Sheefoo Settings</title>
       </Head>
 
       <h1 className=" pb-2 text-right font-heading text-4xl text-accent_2">

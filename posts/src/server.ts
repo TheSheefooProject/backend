@@ -1,5 +1,5 @@
 import morgan from 'morgan';
-import { client } from './redis';
+import client from './redis';
 import app from './app';
 import mongoose from 'mongoose';
 
@@ -12,7 +12,6 @@ mongoose
   .connect('mongodb://posts-db:27017/post-db')
   .then(() => {
     console.log('Database connection made');
-
     client
       .connect()
       .then(() => {

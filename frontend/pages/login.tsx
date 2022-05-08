@@ -9,6 +9,7 @@ import axios from 'axios'
 import { get_user_details_api, login_api } from '../helpers/api_helper'
 import Link from 'next/link'
 import { FiInfo, FiAlertTriangle, FiAlertCircle } from 'react-icons/fi'
+import Head from 'next/head'
 
 const Login = (props: { localStorage: Storage }) => {
   const { localStorage = null, ...restProps } = props
@@ -110,8 +111,11 @@ const Login = (props: { localStorage: Storage }) => {
   }
   return (
     <main className="static flex min-h-screen w-[100%] flex-col items-center justify-center overflow-x-hidden bg-back_3 px-10 pt-0 text-text_1 md:px-[25vw]">
+      <Head>
+        <title>Sheefoo Login</title>
+      </Head>
       {/* Profile Container */}
-      <div className="flex min-w-max flex-col items-center border-2 border-gray-200 bg-gray-300 p-2 font-body drop-shadow-lg dark:border-gray-500 dark:bg-gray-600 md:flex-row">
+      <div className="flex min-w-max flex-col items-center border-2  border-gray-300 bg-gray-400 p-2 font-body drop-shadow-lg md:flex-row">
         <div id="loginlogo" className="m-3 h-48 w-48 drop-shadow-xl">
           <Image src="/logo.svg" width={200} height={200}></Image>
         </div>

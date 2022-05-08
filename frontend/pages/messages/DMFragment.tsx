@@ -48,23 +48,25 @@ const DMFragment: NextPage<Props> = (props) => {
                   </p>
                 )
               }
-              return (
-                <p
-                  itemType="outgoing"
-                  className="relative max-w-[50%]"
-                  id={message.id + idx}
-                >
-                  <div className="ml-6 w-fit max-w-[100%] overflow-hidden overflow-ellipsis rounded-lg rounded-bl-none bg-back_4 px-4 py-2">
-                    {message.message}
-                    <span className="absolute left-0 -bottom-5 text-sm text-gray-400">
-                      {message.user_name}
-                    </span>
-                    <span className="absolute left-2 -bottom-0 text-sm text-gray-400">
-                      ⮣
-                    </span>
-                  </div>
-                </p>
-              )
+              if (message.type == 'OUTGOING') {
+                return (
+                  <p
+                    itemType="outgoing"
+                    className="relative max-w-[50%]"
+                    id={message.id + idx}
+                  >
+                    <div className="ml-6 w-fit max-w-[100%] overflow-hidden overflow-ellipsis rounded-lg rounded-bl-none bg-back_4 px-4 py-2">
+                      {message.message}
+                      <span className="absolute left-0 -bottom-5 text-sm text-gray-400">
+                        {message.user_name}
+                      </span>
+                      <span className="absolute left-2 -bottom-0 text-sm text-gray-400">
+                        ⮣
+                      </span>
+                    </div>
+                  </p>
+                )
+              }
             })}
           </div>
         )}

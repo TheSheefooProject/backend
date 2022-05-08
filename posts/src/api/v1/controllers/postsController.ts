@@ -2,9 +2,7 @@ import AppError from '../interfaces/AppError';
 import { NextFunction, Request, Response } from 'express';
 import posts from '../models/posts/posts';
 import * as redis from 'redis';
-import { promisify } from 'util';
-import { client, getAsync, setAsync } from '../../../redis';
-import { crossOriginOpenerPolicy } from 'helmet';
+import client from '../../../redis';
 
 interface validationStatus {
   valid: boolean;
